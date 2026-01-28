@@ -13,6 +13,7 @@ def main():
     clock = pygame.time.Clock()
     bg = LayeredBackgroundBlue(configs)
     f_hud = pygame.font.Font(configs.font_path, 14)
+    paused = False
 
     # База на знаења
     knowledge_by_lang = {
@@ -251,6 +252,7 @@ def main():
 
     knowledge_pool = []
     collected_lessons = []
+    all_lessons = []
 
     def refresh_knowledge():
         nonlocal knowledge_pool
@@ -305,8 +307,12 @@ def main():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 configs.reset_game()
                 collected_lessons = []
-                player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+                all_lessons = []
 
+                player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                paused = not paused
+                continue
             if not quiz.active and configs.game_active:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     if not configs.show_instructions:
@@ -317,6 +323,28 @@ def main():
                     enemies.add(Enemy(configs, random.random() < (0.2 + configs.current_level * 0.05)))
 
             quiz.handle_event(event)
+
+        if paused:
+            # затемнување
+            ov = pygame.Surface((configs.screen_width, configs.screen_height), pygame.SRCALPHA)
+            ov.fill((0, 0, 0, 200))
+            screen.blit(ov, (0, 0))
+
+            # наслов
+            font = pygame.font.Font(configs.font_path, 18)
+            title = font.render("PAUSED - Press P to continue", True, (255, 255, 255))
+            screen.blit(title, (configs.screen_width // 2 - title.get_width() // 2, 30))
+
+            # тука ја црташ summary листата (со/без scrolling)
+            # варијанта А: ако draw_knowledge_summary само црта (без да враќа scroll)
+            draw_knowledge_summary(screen, configs, all_lessons)
+
+            # варијанта Б: ако имаш scrolling верзија што враќа max_scroll + scroll_y
+            # pause_max_scroll, pause_scroll_y = draw_knowledge_summary(screen, configs, collected_lessons, pause_scroll_y)
+
+            pygame.display.flip()
+            clock.tick(60)
+            continue
 
         # 3. Инструкции
         if configs.show_instructions:
@@ -346,6 +374,7 @@ def main():
                         if knowledge_pool:
                             knowledge_msg = d.text
                             collected_lessons.append(knowledge_msg)
+                            all_lessons.append(knowledge_msg)
                             msg_timer = 200
                             configs.knowledge_points += 1  #
 
@@ -410,6 +439,7 @@ def main():
                                 configs.next_level()
                                 configs.show_instructions = True
                                 player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+                                all_lessons = []
 
                 # --- ПУКАЊЕ ВО ОБИЧНИ НЕПРИЈАТЕЛИ ---
                 for b in bullets:

@@ -88,7 +88,7 @@ class QuizSystem:
         self.correct = False
 
         # Речник што ги мапира нивоата со соодветните прашања (1->Ниво 2, 3->Ниво 4...)
-        self.questions_map = {2: 1, 4: 3, 6: 5}
+        self.questions_map = {2: 1, 4: 2, 6: 3}
         self.all_questions = {
             'MK': {
                 1: [  # 15 прашања за Ниво 2
