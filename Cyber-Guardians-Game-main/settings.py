@@ -47,7 +47,7 @@ class GameSettings:
                 'level_desc': {
                     1: ["Добредојде, млади Сајбер Чувар!", "Твојата мисија започнува со основите.",
                         "Собери 5 токени за знаење.","БОНУС: На секои 250 поени добиваш +1 живот!", "Научи за HTTPS и силните лозинки.",
-                        "Биди брз, вирусите се само почеток!"],
+                        "Биди брз, вирусите се само почеток!", "За да ги видиш собраните знаења притисни 'P'"],
                     2: ["ВНИМАНИЕ! Се појави првиот голем вирус!", "Тој ја блокира портата со лозинки.",
                         "Погоди го 5 пати за квиз.", "Одговори точно на 5 прашања.", "Секоја грешка чини еден живот!"],
                     3: ["Одлично! Системот станува побрз.", "Сега учиме за Phishing измами.",
@@ -81,7 +81,7 @@ class GameSettings:
                 'level_desc': {
                     1: ["Welcome, young Cyber Guardian!", "Your mission starts with the basics.",
                         "Collect 5 knowledge tokens.", "BONUS: Every 250 points gives you +1 life!", "Learn about HTTPS and strong passwords.",
-                        "Be fast, viruses are just the beginning!"],
+                        "Be fast, viruses are just the beginning!", "To see the collected knowledge, press 'P'"],
                     2: ["WARNING! The first big virus appeared!", "He blocks the gate with passwords.",
                         "Hit him 5 times for a quiz.", "Answer 5 questions correctly.", "Every mistake costs one life!"],
                     3: ["Great! The system is getting faster.", "Now we learn about Phishing scams.",
@@ -115,7 +115,7 @@ class GameSettings:
                 'level_desc': {
                     1: ["Mirësevini, Mbrojtës i ri Kibernetik!", "Misioni juaj fillon me bazat.",
                         "Mblidhni 5 argumente njohurish.", "BONUS: Çdo 250 pikë ju jep +1 jetë!", "Mësoni për HTTPS dhe fjalëkalimet.",
-                        "Shpejtoni, viruset janë vetëm fillimi!"],
+                        "Shpejtoni, viruset janë vetëm fillimi!", "Për të parë njohuritë e mbledhura, shtyp 'P'"],
                     2: ["KUJDES! U shfaq virusi i parë i madh!", "Ai bllokon portën me fjalëkalime.",
                         "Gjuaj 5 herë për të hapur kuizin.", "Përgjigju saktë në 5 pyetje.", "Çdo gabim ju kushton një jetë!"],
                     3: ["Shkëlqyeshëm! Sistemi po shpejtohet.", "Tani mësojmë për mashtrimet Phishing.",
@@ -150,7 +150,7 @@ class GameSettings:
                 'level_desc': {
                     1: ["Hoş geldin, genç Siber Koruyucu!", "Görevin temel bilgilerle başlıyor.",
                         "5 bilgi tokeni topla.", "BONUS: Her 250 puan size +1 can verir!", "HTTPS ve güçlü şifreleri öğren.",
-                        "Hızlı ol, virüsler sadece başlangıç!"],
+                        "Hızlı ol, virüsler sadece başlangıç!", "Toplanan bilgileri görmek için 'P' tuşuna basın"],
                     2: ["DİKKAT! İlk büyük virüs ortaya çıktı!", "Kapıyı şifrelerle bloke ediyor.",
                         "Testi açmak için 5 kez vur.", "5 soruyu doğru cevaplamalısın.", "Her hata bir cana mal olur!"],
                     3: ["Harika! Sistem giderek hızlanıyor.", "Şimdi Phishing dolandırıcılığını öğreniyoruz.",

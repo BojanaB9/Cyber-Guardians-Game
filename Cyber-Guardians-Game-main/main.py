@@ -285,6 +285,7 @@ def main():
     player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
     configs.boss_active = False
     SPAWN_ENEMY = pygame.USEREVENT + 1
+    ENEMY_SPAWN_MS = 1000
     hit_counter = 0
     msg_timer = 0
     knowledge_msg = ""
@@ -308,7 +309,7 @@ def main():
                         quiz.load_for_level(configs.current_level)
 
                         refresh_knowledge()
-                        pygame.time.set_timer(SPAWN_ENEMY, 1000)
+                        pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
             continue
 
         bg.update(dt_ms)
@@ -324,8 +325,17 @@ def main():
                 all_lessons = []
 
                 player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+                pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 paused = not paused
+                if paused:
+                    # stop enemy spawn timer
+                    pygame.time.set_timer(SPAWN_ENEMY, 0)
+                else:
+                    # resume enemy spawn timer (only if not boss level)
+                    if not configs.boss_active:
+                        pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
                 continue
             if not quiz.active and configs.game_active:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -418,6 +428,9 @@ def main():
                         drops.empty()
                         player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
                         quiz.load_for_level(configs.current_level)
+                        pygame.time.set_timer(SPAWN_ENEMY, 0 if configs.boss_active else ENEMY_SPAWN_MS)
+
+
 
                 # --- БОС НИВОА (2, 4, 6) ---
                 else:
