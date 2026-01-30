@@ -262,18 +262,6 @@ def main():
         knowledge_pool = list(pool_source.get(lvl, []))
         random.shuffle(knowledge_pool)
 
-    def wait_transition(ms=1000):
-        """Small delay that still pumps events so the window doesn't freeze."""
-        start = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start < ms:
-            for e in pygame.event.get():
-                if e.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-            pygame.display.flip()
-            clock.tick(60)
-
-
     def init_game():
         p = Player(configs)
         if configs.current_level % 2 != 0: refresh_knowledge()
