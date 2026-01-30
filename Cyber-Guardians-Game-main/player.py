@@ -11,7 +11,7 @@ class Player(AnimatedSprite):
             os.path.join("assets", "player_spaceship_1.png"),
             frame_w=32,
             frame_h=40,
-            scale_to=(70, 90)   # keep same size as before
+            scale_to=(70, 90)
         )
 
         super().__init__(frames, fps=12)

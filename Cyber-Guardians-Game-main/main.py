@@ -262,11 +262,25 @@ def main():
         knowledge_pool = list(pool_source.get(lvl, []))
         random.shuffle(knowledge_pool)
 
+    def wait_transition(ms=1000):
+        """Small delay that still pumps events so the window doesn't freeze."""
+        start = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - start < ms:
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            pygame.display.flip()
+            clock.tick(60)
+
+
     def init_game():
         p = Player(configs)
         if configs.current_level % 2 != 0: refresh_knowledge()
         return p, pygame.sprite.Group(p), pygame.sprite.Group(), pygame.sprite.Group(), \
             pygame.sprite.Group(), QuizSystem(screen, configs), None
+
+
 
     player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
     configs.boss_active = False
@@ -334,13 +348,7 @@ def main():
             font = pygame.font.Font(configs.font_path, 18)
             title = font.render("PAUSED - Press P to continue", True, (255, 255, 255))
             screen.blit(title, (configs.screen_width // 2 - title.get_width() // 2, 30))
-
-            # тука ја црташ summary листата (со/без scrolling)
-            # варијанта А: ако draw_knowledge_summary само црта (без да враќа scroll)
             draw_knowledge_summary(screen, configs, all_lessons)
-
-            # варијанта Б: ако имаш scrolling верзија што враќа max_scroll + scroll_y
-            # pause_max_scroll, pause_scroll_y = draw_knowledge_summary(screen, configs, collected_lessons, pause_scroll_y)
 
             pygame.display.flip()
             clock.tick(60)
@@ -360,8 +368,8 @@ def main():
         if configs.game_active:
             if not quiz.active:
                 player.update(pygame.key.get_pressed())
-                bullets.update();
-                enemies.update();
+                bullets.update()
+                enemies.update()
                 drops.update()
 
                 # --- НИВОА СО СОБИРАЊЕ (1, 3, 5) ---
@@ -394,18 +402,19 @@ def main():
                                 if e.type == pygame.KEYDOWN and e.key == pygame.K_SPACE:
                                     wait = False
                                 if e.type == pygame.QUIT:
-                                    pygame.quit();
+                                    pygame.quit()
                                     sys.exit()
 
                         # 3. ДУРИ СЕГА ОДИ НА СЛЕДНО НИВО
+                        knowledge_msg = ""
                         configs.next_level()
                         configs.knowledge_points = 0  # Ресетирај за следното собирање
                         configs.show_instructions = True
                         collected_lessons = []
 
                         # Чистење на екранот и ресетирање објекти
-                        enemies.empty();
-                        bullets.empty();
+                        enemies.empty()
+                        bullets.empty()
                         drops.empty()
                         player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
                         quiz.load_for_level(configs.current_level)
