@@ -13,6 +13,20 @@ def main():
     clock = pygame.time.Clock()
     bg = LayeredBackgroundBlue(configs)
     f_hud = pygame.font.Font(configs.font_path, 14)
+    pygame.mixer.music.load("assets/ES_Tiger Tracks - Lexica.mp3")
+    pygame.mixer.music.set_volume(0.4)  # 0.0 - 1.0
+    pygame.mixer.music.play(-1)  # -1 = infinite loop
+    shoot_sfx = pygame.mixer.Sound("assets/ES_laser.wav")
+    drop_sfx = pygame.mixer.Sound("assets/ES_Token.mp3")
+    enemy_die_sfx = pygame.mixer.Sound("assets/ES_enemydeath.wav")
+    extra_life_sfx = pygame.mixer.Sound("assets/ES_extralife.wav")
+    player_hit_sfx = pygame.mixer.Sound("assets/ES_playerHit.wav")
+    player_hit_sfx.set_volume(0.6)
+    extra_life_sfx.set_volume(0.5)
+    enemy_die_sfx.set_volume(0.5)
+    shoot_sfx.set_volume(0.4)
+    drop_sfx.set_volume(0.8)
+
     paused = False
 
     # База на знаења
@@ -329,6 +343,7 @@ def main():
                         b = Bullet(player.rect.centerx, player.rect.top, configs)
                         bullets.add(b)
                         all_sprites.add(b)
+                        shoot_sfx.play()
                 if event.type == SPAWN_ENEMY and not configs.boss_active:
                     enemies.add(Enemy(configs, random.random() < (0.2 + configs.current_level * 0.05)))
 
@@ -370,7 +385,9 @@ def main():
                 # --- НИВОА СО СОБИРАЊЕ (1, 3, 5) ---
                 if configs.current_level % 2 != 0 and configs.current_level < 7:
 
-                    if pygame.sprite.spritecollide(player, enemies, True): configs.shields -= 1
+                    if pygame.sprite.spritecollide(player, enemies, True):
+                        configs.shields -= 1
+                        player_hit_sfx.play()
                     for d in pygame.sprite.spritecollide(player, drops, True):
                         if knowledge_pool:
                             txt = d.text
@@ -379,6 +396,7 @@ def main():
                             all_lessons.append(txt)
                             msg_timer = 200
                             configs.knowledge_points += 1
+                            drop_sfx.play()
 
                     target_k = 5 if configs.current_level == 1 else 10 if configs.current_level == 3 else 15
                     if configs.knowledge_points >= target_k:
@@ -447,15 +465,18 @@ def main():
                         e.hp -= 1
                         b.kill()
                         if e.hp <= 0:
+                            enemy_die_sfx.play()
                             if e.is_special and configs.current_level % 2 != 0:
                                 drop = KnowledgeDrop(e.rect.centerx, e.rect.centery, knowledge_pool)
                                 drops.add(drop)
                                 all_sprites.add(drop)
                                 configs.score += 30
+
                             else:
                                 configs.score += 10
 
                             if configs.score // 250 > configs.last_life_score // 250:
+                                extra_life_sfx.play()
                                 configs.shields += 1
                                 configs.last_life_score = (configs.score // 250) * 250
                                 knowledge_msg = "BONUS: +1 LIFE!"
