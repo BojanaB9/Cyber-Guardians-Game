@@ -13,7 +13,7 @@
 Елементи од позадината: https://ansimuz.itch.io/space-background <br>
 Елементи за играчот: https://realcreative.itch.io/pixel-art-space-game-asset-pack <br>
 Елементи за непријателите: <br>
--   Вирусот од ниво 2: https://batareya.itch.io/pixel-monster-pack-1
+-   Вирусот од ниво 2: https://batareya.itch.io/pixel-monster-pack-1 <br> 
 -   Вирѕсите од нивоа 4,6 и 7: https://lunascra.itch.io/50-rpg-dungeon-monsters-pixel-art-enemy-pack<br>
 -   Леталата: https://realcreative.itch.io/pixel-art-space-game-asset-pack <br>
 Спрајт за токенот: https://gentlecatstudio.itch.io/rpg-items
