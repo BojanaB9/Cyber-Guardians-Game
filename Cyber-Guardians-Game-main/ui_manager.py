@@ -1,8 +1,8 @@
+import sys
 import pygame
 import os
 import random
 import math
-
 
 def draw_language_selection(screen, settings):
     screen.fill((10, 20, 50))
@@ -13,7 +13,6 @@ def draw_language_selection(screen, settings):
     for i, (text, code) in enumerate(options):
         txt = font.render(text, True, (0, 255, 255))
         screen.blit(txt, (450 - txt.get_width() // 2, 300 + i * 60))
-
 
 def draw_detailed_level_intro(screen, settings):
     lang = settings.language or 'MK'
@@ -38,27 +37,20 @@ def draw_detailed_level_intro(screen, settings):
     screen.blit(font_text.render(space_str, True, (150, 0, 0)),
                 (450 - font_text.size(space_str)[0] // 2, panel_y + panel_h - 40))
 
-
 class LayeredBackgroundBlue:
     def __init__(self, settings, folder="assets/layered", size=(900, 700)):
-        self.settings = settings;
+        self.settings = settings
         self.t = 0.0
         try:
-            self.back = pygame.transform.smoothscale(pygame.image.load(os.path.join(folder, "blue-back.png")).convert(),
-                                                     size)
-            self.stars = pygame.transform.smoothscale(
-                pygame.image.load(os.path.join(folder, "blue-stars.png")).convert_alpha(), size)
+            self.back = pygame.transform.smoothscale(pygame.image.load(os.path.join(folder, "blue-back.png")).convert(), size)
+            self.stars = pygame.transform.smoothscale(pygame.image.load(os.path.join(folder, "blue-stars.png")).convert_alpha(), size)
             self.props = [
-                {"img": pygame.image.load(os.path.join(folder, "prop-planet-big.png")).convert_alpha(),
-                 "pos": (650, 90), "spd": 0.35, "amp": 8},
-                {"img": pygame.image.load(os.path.join(folder, "asteroid-1.png")).convert_alpha(), "pos": (820, 360),
-                 "spd": 0.9, "amp": 4}
+                {"img": pygame.image.load(os.path.join(folder, "prop-planet-big.png")).convert_alpha(), "pos": (650, 90), "spd": 0.35, "amp": 8},
+                {"img": pygame.image.load(os.path.join(folder, "asteroid-1.png")).convert_alpha(), "pos": (820, 360), "spd": 0.9, "amp": 4}
             ]
         except:
-            self.back = pygame.Surface(size);
-            self.back.fill((10, 10, 30))
-            self.stars = pygame.Surface(size, pygame.SRCALPHA);
-            self.props = []
+            self.back = pygame.Surface(size); self.back.fill((10, 10, 30))
+            self.stars = pygame.Surface(size, pygame.SRCALPHA); self.props = []
 
     def update(self, dt_ms):
         self.t += dt_ms / 1000.0
@@ -70,25 +62,18 @@ class LayeredBackgroundBlue:
             y = p["pos"][1] + math.sin(self.t * p["spd"]) * p["amp"]
             screen.blit(p["img"], (p["pos"][0], int(y)))
 
-
-# Во ui_manager.py
 class QuizSystem:
     def __init__(self, screen, settings):
         self.screen = screen
         self.settings = settings
         self.active = False
-
-        # ОВИЕ ЛИНИИ МОРА ДА ПОСТОЈАТ ЗА ДА НЕМА ГРЕШКА
-        self.questions_pool = []  # Листа на достапни прашања за тековното ниво
-        self.used_questions = []  # Листа на веќе одговорени прашања
+        self.questions_pool = []
+        self.used_questions = []
         self.current_q = None
-
         self.correct_answers_count = 0
         self.showing_feedback = False
         self.correct = False
-
-        # Речник што ги мапира нивоата со соодветните прашања (1->Ниво 2, 3->Ниво 4...)
-        self.questions_map = {2: 1, 4: 2, 6: 3}
+        self.questions_map = {2: 1, 4: 2, 6: 3, 7: "final"} # Ниво 7 користи сите прашања
         self.all_questions = {
             'MK': {
                 1: [  # 15 прашања за Ниво 2
@@ -236,7 +221,59 @@ class QuizSystem:
                      "e": "Дури и да ти го украдат РС, нема да читаат податоци."},
                     {"q": "Учењето за дигитални закани е?", "o": ["Постојан процес", "Еднократно"], "c": 0,
                      "e": "Светот се менува, мора да бидеш во тек."}
-                ]
+                ],
+                "final": [
+    {"q": "Што е 'Juice Jacking'?", "o": ["Кражба преку јавно USB", "Брзо полнење"], "c": 0, "e": "Јавните USB порти можат да пренесат вируси."},
+    {"q": "Што е 'Digital Footprint'?", "o": ["Трага на интернет", "Големина на податок"], "c": 0, "e": "Сè што објавуваш останува засекогаш."},
+    {"q": "Што е 'Zero-Day' напад?", "o": ["Напад на непозната дупка", "Стар вирус"], "c": 0, "e": "Тоа е напад пред да се направи поправка."},
+    {"q": "Што значи 'Encryption'?", "o": ["Шифрирање податоци", "Бришење"], "c": 0, "e": "Ги прави податоците нечитливи за хакери."},
+    {"q": "Што е '2FA'?", "o": ["Лозинка + дополнителен код", "Две лозинки"], "c": 0, "e": "Дополнителен слој на безбедност."},
+    {"q": "Кој Wi-Fi е најбезбеден?", "o": ["WPA3", "WEP"], "c": 0, "e": "WPA3 е најновиот безбедносен стандард."},
+    {"q": "Што е 'Social Engineering'?", "o": ["Манипулација на луѓе", "Програмирање"], "c": 0, "e": "Лажење за да се добијат тајни."},
+    {"q": "Што е 'Spyware'?", "o": ["Вирус што те следи", "Антивирус"], "c": 0, "e": "Снима активност без твое знаење."},
+    {"q": "Што е 'Keylogger'?", "o": ["Снима секоја буква", "Програм за музика"], "c": 0, "e": "Ги краде лозинките додека ги пишуваш."},
+    {"q": "Што е 'Botnet'?", "o": ["Мрежа на заразени РС", "Вид на интернет"], "c": 0, "e": "Се користи за масовни напади."},
+    {"q": "Што е 'Firewall'?", "o": ["Мрежен филтер", "Хард диск"], "c": 0, "e": "Го филтрира сообраќајот кон твојот РС."},
+    {"q": "Што е 'DDoS'?", "o": ["Напад за преоптоварување", "Брз интернет"], "c": 0, "e": "Го урива сајтот со премногу сообраќај."},
+    {"q": "Што е 'Trojan'?", "o": ["Маскиран вирус", "Игра"], "c": 0, "e": "Изгледа корисно, но е опасно."},
+    {"q": "Што е 'Rootkit'?", "o": ["Вирус со целосна контрола", "Поправка"], "c": 0, "e": "Дава администраторски пристап на хакерот."},
+    {"q": "Што е 'Sandboxing'?", "o": ["Изолирана тест зона", "Вид игра"], "c": 0, "e": "Го изолира вирусот за да не се рашири."},
+    {"q": "Што е 'Ransomware'?", "o": ["Вирус за откуп", "Вид реклама"], "c": 0, "e": "Ги заклучува фајловите за пари."},
+    {"q": "Што е 'Password Manager'?", "o": ["Сеф за лозинки", "Вирус"], "c": 0, "e": "Ги чува твоите лозинки шифрирани."},
+    {"q": "Дали 'Incognito' те крие?", "o": ["Не од хакери", "Да, целосно"], "c": 0, "e": "Само не ја чува локалната историја."},
+    {"q": "Што е 'Spear Phishing'?", "o": ["Насочен напад", "Напад на сите"], "c": 0, "e": "Напад врз точно одредена личност."},
+    {"q": "Што е 'Pharming'?", "o": ["Пренасочување сајтови", "Земјоделство"], "c": 0, "e": "Те носи на лажен сајт без да знаеш."},
+    {"q": "Што е 'SQL Injection'?", "o": ["Напад на база", "Вирус на диск"], "c": 0, "e": "Вметнување опасен код во базите."},
+    {"q": "Што е 'Brute Force'?", "o": ["Погодување лозинки", "Вид процесор"], "c": 0, "e": "Обид со милиони комбинации."},
+    {"q": "Што е 'Man-in-the-Middle'?", "o": ["Пресретнување пораки", "Игра"], "c": 0, "e": "Хакер што ги чита твоите пораки."},
+    {"q": "Што е 'Malware'?", "o": ["Штетен софтвер", "Добар програм"], "c": 0, "e": "Секој програм што му штети на РС."},
+    {"q": "Што е 'Patch'?", "o": ["Поправка на софтвер", "Слика"], "c": 0, "e": "Ги крпи безбедносните дупки."},
+    {"q": "Што е 'Backup'?", "o": ["Резервна копија", "Бришење"], "c": 0, "e": "Те спасува ако изгубиш податоци."},
+    {"q": "Што е 'Cookie'?", "o": ["Податок за сесија", "Вирус"], "c": 0, "e": "Ги памти твоите поставки на сајтот."},
+    {"q": "Што е 'VPN'?", "o": ["Приватна мрежа", "Брз нет"], "c": 0, "e": "Создава безбеден тунел за податоците."},
+    {"q": "Што е 'Whaling'?", "o": ["Напад на директори", "Лов"], "c": 0, "e": "Phishing на многу важни личности."},
+    {"q": "Што е 'Honey Pot'?", "o": ["Замка за хакери", "Мед"], "c": 0, "e": "Лажен систем што ги мами хакерите."},
+    {"q": "Што е 'Dark Web'?", "o": ["Скриен дел од нет", "Нет без боја"], "c": 0, "e": "Дел кој не се наоѓа на Google."},
+    {"q": "Што е 'Biometrics'?", "o": ["Отпечаток/Лице", "Мерење"], "c": 0, "e": "Користење на телото за најава."},
+    {"q": "Што е 'Spam'?", "o": ["Непосакувана пошта", "Вирус"], "c": 0, "e": "Масовни пораки со реклами или измами."},
+    {"q": "Што е 'IoT'?", "o": ["Паметни уреди", "Процесор"], "c": 0, "e": "Предмети поврзани на интернет."},
+    {"q": "Што е 'White Hat'?", "o": ["Етички хакер", "Опасен хакер"], "c": 0, "e": "Хакер што помага во заштитата."},
+    {"q": "Што е 'Black Hat'?", "o": ["Злонамерен хакер", "Почетник"], "c": 0, "e": "Хакер што краде за своја корист."},
+    {"q": "Што е 'Clickjacking'?", "o": ["Лажни копчиња", "Брзо кликање"], "c": 0, "e": "Те мами да кликнеш на скриен линк."},
+    {"q": "Што е 'Malvertising'?", "o": ["Опасни реклами", "Вести"], "c": 0, "e": "Ширење вируси преку реклами."},
+    {"q": "Што е 'Data Breach'?", "o": ["Протекување податоци", "Бришење"], "c": 0, "e": "Кога приватни податоци стануваат јавни."},
+    {"q": "Лоша лозинка е?", "o": ["Роденден", "Комбинација знаци"], "c": 0, "e": "Лесните податоци брзо се погодуваат."},
+    {"q": "Што прави антивирусот?", "o": ["Скенира и чисти", "Брише фајлови"], "c": 0, "e": "Бара и отстранува штетен код."},
+    {"q": "Кој е најголем ризик?", "o": ["Човечка грешка", "Слаб компјутер"], "c": 0, "e": "Луѓето најлесно се манипулираат."},
+    {"q": "Што е 'Shoulder Surfing'?", "o": ["Гледање преку рамо", "Вид сурфање"], "c": 0, "e": "Крадење шифра со гледање додека ја пишуваш."},
+    {"q": "Што е 'Cold Wallet'?", "o": ["Офлајн крипто сеф", "Студен паричник"], "c": 0, "e": "Најбезбеден начин за чување крипто."},
+    {"q": "Што е 'Script Kiddie'?", "o": ["Аматер хакер", "Дете што пишува"], "c": 0, "e": "Користи туѓи алатки без знаење."},
+    {"q": "Што е 'Logic Bomb'?", "o": ["Код што чека настан", "Експлозив"], "c": 0, "e": "Вирус кој се активира во одредено време."},
+    {"q": "Што е 'Bug'?", "o": ["Грешка во код", "Инсект"], "c": 0, "e": "Пропуст кој може да биде опасен."},
+    {"q": "Што е 'Phreaking'?", "o": ["Хакирање телефони", "Страв"], "c": 0, "e": "Манипулација на телефонски мрежи."},
+    {"q": "Што е 'Exploit'?", "o": ["Искористување дупка", "Поправка"], "c": 0, "e": "Алатка за влез преку пропуст."},
+    {"q": "Дигитална безбедност е?", "o": ["Постојана грижа", "Еднократна задача"], "c": 0, "e": "Секогаш треба да бидеш внимателен."}
+]
             },
             'EN': {
                 1: [  # 15 Questions for Level 2
@@ -383,6 +420,106 @@ class QuizSystem:
                      "e": "Stops data theft even if PC is stolen."},
                     {"q": "Learning digital security is?", "o": ["Ongoing process", "One-time"], "c": 0,
                      "e": "World changes, stay updated."}
+                ],
+                "final": [
+                    {"q": "What is 'Juice Jacking'?", "o": ["Theft via public USB", "Fast charging"], "c": 0,
+                     "e": "Public USB ports can transfer viruses."},
+                    {"q": "What is 'Digital Footprint'?", "o": ["Online trail", "Data size"], "c": 0,
+                     "e": "Everything you post stays forever."},
+                    {"q": "What is a 'Zero-Day' attack?", "o": ["Unknown vulnerability", "Old virus"], "c": 0,
+                     "e": "Attack before a patch exists."},
+                    {"q": "What is 'Encryption'?", "o": ["Scrambling data", "Deleting"], "c": 0,
+                     "e": "Makes data unreadable for hackers."},
+                    {"q": "What is '2FA'?", "o": ["Password + code", "Two passwords"], "c": 0,
+                     "e": "An extra layer of security."},
+                    {"q": "Safest Wi-Fi?", "o": ["WPA3", "WEP"], "c": 0, "e": "WPA3 is the latest security standard."},
+                    {"q": "What is 'Social Engineering'?", "o": ["Manipulating people", "Programming"], "c": 0,
+                     "e": "Lying to get secret info."},
+                    {"q": "What is 'Spyware'?", "o": ["Tracking virus", "Antivirus"], "c": 0,
+                     "e": "Records activity without consent."},
+                    {"q": "What is 'Keylogger'?", "o": ["Records keystrokes", "Music player"], "c": 0,
+                     "e": "Steals passwords as you type."},
+                    {"q": "What is a 'Botnet'?", "o": ["Infected PC network", "Internet type"], "c": 0,
+                     "e": "Used for massive attacks."},
+                    {"q": "What is a 'Firewall'?", "o": ["Traffic filter", "Hard drive"], "c": 0,
+                     "e": "Filters traffic to your PC."},
+                    {"q": "What is 'DDoS'?", "o": ["Overload attack", "Fast internet"], "c": 0,
+                     "e": "Crashes sites with high traffic."},
+                    {"q": "What is a 'Trojan'?", "o": ["Disguised virus", "Game"], "c": 0,
+                     "e": "Looks useful but is harmful."},
+                    {"q": "What is a 'Rootkit'?", "o": ["Full control virus", "Repair kit"], "c": 0,
+                     "e": "Gives admin access to hackers."},
+                    {"q": "What is 'Sandboxing'?", "o": ["Isolated test zone", "Game type"], "c": 0,
+                     "e": "Prevents virus spreading."},
+                    {"q": "What is 'Ransomware'?", "o": ["Extortion virus", "Ad type"], "c": 0,
+                     "e": "Locks files for money."},
+                    {"q": "What is a 'Password Manager'?", "o": ["Password vault", "Virus"], "c": 0,
+                     "e": "Stores passwords encrypted."},
+                    {"q": "Does 'Incognito' hide you?", "o": ["Not from hackers", "Yes, fully"], "c": 0,
+                     "e": "Only hides history locally."},
+                    {"q": "What is 'Spear Phishing'?", "o": ["Targeted attack", "Mass attack"], "c": 0,
+                     "e": "Attack on a specific person."},
+                    {"q": "What is 'Pharming'?", "o": ["Site redirection", "Farming"], "c": 0,
+                     "e": "Takes you to a fake site secretly."},
+                    {"q": "What is 'SQL Injection'?", "o": ["Database attack", "Disk virus"], "c": 0,
+                     "e": "Injecting malicious code in DBs."},
+                    {"q": "What is 'Brute Force'?", "o": ["Guessing passwords", "Processor type"], "c": 0,
+                     "e": "Million-combination attempt."},
+                    {"q": "What is 'Man-in-the-Middle'?", "o": ["Intercepting messages", "Game"], "c": 0,
+                     "e": "Hacker reading your messages."},
+                    {"q": "What is 'Malware'?", "o": ["Harmful software", "Good program"], "c": 0,
+                     "e": "Any program harming a PC."},
+                    {"q": "What is a 'Patch'?", "o": ["Software fix", "Picture"], "c": 0, "e": "Fixes security holes."},
+                    {"q": "What is 'Backup'?", "o": ["Data copy", "Deleting"], "c": 0,
+                     "e": "Saves you from data loss."},
+                    {"q": "What is a 'Cookie'?", "o": ["Session data", "Virus"], "c": 0,
+                     "e": "Remembers site settings."},
+                    {"q": "What is a 'VPN'?", "o": ["Private network", "Fast net"], "c": 0,
+                     "e": "Creates a secure data tunnel."},
+                    {"q": "What is 'Whaling'?", "o": ["CEO attack", "Hunting"], "c": 0,
+                     "e": "Phishing targeted at VIPs."},
+                    {"q": "What is a 'Honey Pot'?", "o": ["Hacker trap", "Honey"], "c": 0,
+                     "e": "Decoy system to trick hackers."},
+                    {"q": "What is 'Dark Web'?", "o": ["Hidden web part", "Colorless web"], "c": 0,
+                     "e": "Parts not indexed by Google."},
+                    {"q": "What is 'Biometrics'?", "o": ["Fingerprint/Face", "Weighting"], "c": 0,
+                     "e": "Using body for login."},
+                    {"q": "What is 'Spam'?", "o": ["Unwanted mail", "Virus"], "c": 0,
+                     "e": "Mass ads or scam messages."},
+                    {"q": "What is 'IoT'?", "o": ["Smart devices", "Processor"], "c": 0,
+                     "e": "Objects connected to internet."},
+                    {"q": "What is 'White Hat'?", "o": ["Ethical hacker", "Harmful hacker"], "c": 0,
+                     "e": "Hacker who helps security."},
+                    {"q": "What is 'Black Hat'?", "o": ["Malicious hacker", "Beginner"], "c": 0,
+                     "e": "Hacker stealing for gain."},
+                    {"q": "What is 'Clickjacking'?", "o": ["Fake buttons", "Fast clicking"], "c": 0,
+                     "e": "Tricks you to click hidden links."},
+                    {"q": "What is 'Malvertising'?", "o": ["Harmful ads", "News"], "c": 0,
+                     "e": "Virus spread via ads."},
+                    {"q": "What is a 'Data Breach'?", "o": ["Data leak", "Deleting"], "c": 0,
+                     "e": "Private data becoming public."},
+                    {"q": "A bad password is?", "o": ["Birthday", "Symbol combination"], "c": 0,
+                     "e": "Easy data is guessed quickly."},
+                    {"q": "What does antivirus do?", "o": ["Scan and clean", "Delete files"], "c": 0,
+                     "e": "Finds and removes harmful code."},
+                    {"q": "Biggest risk?", "o": ["Human error", "Weak PC"], "c": 0,
+                     "e": "Humans are easiest to manipulate."},
+                    {"q": "What is 'Shoulder Surfing'?", "o": ["Watching over shoulder", "Surfing"], "c": 0,
+                     "e": "Stealing password by watching."},
+                    {"q": "What is a 'Cold Wallet'?", "o": ["Offline crypto vault", "Cold bag"], "c": 0,
+                     "e": "Safest way to store crypto."},
+                    {"q": "What is a 'Script Kiddie'?", "o": ["Amateur hacker", "Child"], "c": 0,
+                     "e": "Uses tools without knowledge."},
+                    {"q": "What is a 'Logic Bomb'?", "o": ["Code waiting for event", "Explosive"], "c": 0,
+                     "e": "Virus triggered by time/event."},
+                    {"q": "What is a 'Bug'?", "o": ["Coding error", "Insect"], "c": 0,
+                     "e": "A flaw that can be dangerous."},
+                    {"q": "What is 'Phreaking'?", "o": ["Phone hacking", "Fear"], "c": 0,
+                     "e": "Manipulating phone networks."},
+                    {"q": "What is an 'Exploit'?", "o": ["Using a flaw", "Fixing"], "c": 0,
+                     "e": "Tool for entry via security hole."},
+                    {"q": "Digital security is?", "o": ["Constant care", "One-time task"], "c": 0,
+                     "e": "You must always be careful."}
                 ]
             },
             'AL': {
@@ -530,6 +667,107 @@ class QuizSystem:
                      "e": "Ndalon vjedhjen edhe po u mor PC-ja."},
                     {"q": "Mësimi për sigurinë është?", "o": ["Proces i vazhdueshëm", "Një herë"], "c": 0,
                      "e": "Bota ndryshon, mbetu i informuar."}
+                ],
+                "final": [
+                    {"q": "Çfarë është 'Juice Jacking'?", "o": ["Vjedhje me USB publike", "Karikim"], "c": 0,
+                     "e": "Portat USB publike mund të kalojnë viruse."},
+                    {"q": "Çfarë është 'Gjurma Dixhitale'?", "o": ["Gjurmë në internet", "Madhësi e të dhënave"],
+                     "c": 0, "e": "Çdo gjë që postoni mbetet përgjithmonë."},
+                    {"q": "Çfarë është sulmi 'Zero-Day'?", "o": ["Sulm në vrimë të panjohur", "Virus i vjetër"], "c": 0,
+                     "e": "Sulm para se të bëhet riparimi."},
+                    {"q": "Çfarë do të thotë 'Enkriptim'?", "o": ["Kodikim i të dhënave", "Fshirje"], "c": 0,
+                     "e": "I bën të dhënat të palexueshme për hakerat."},
+                    {"q": "Çfarë është '2FA'?", "o": ["Fjalëkalim + kod", "Dy fjalëkalime"], "c": 0,
+                     "e": "Një shtresë shtesë sigurie."},
+                    {"q": "Wi-Fi më i sigurt?", "o": ["WPA3", "WEP"], "c": 0, "e": "WPA3 është standardi më i ri."},
+                    {"q": "Çfarë është 'Inxhinieria Sociale'?", "o": ["Manipulim njerëzish", "Programim"], "c": 0,
+                     "e": "Gënjeshtër për të marrë sekrete."},
+                    {"q": "Çfarë është 'Spyware'?", "o": ["Virus që ju ndjek", "Antivirus"], "c": 0,
+                     "e": "Regjistron aktivitetin pa dijeni."},
+                    {"q": "Çfarë është 'Keylogger'?", "o": ["Regjistron çdo shkronjë", "Program muzikor"], "c": 0,
+                     "e": "Vjedh fjalëkalimet gjatë shkrimit."},
+                    {"q": "Çfarë është 'Botnet'?", "o": ["Rrjet pajisjesh infektuar", "Lloj interneti"], "c": 0,
+                     "e": "Përdoret për sulme masive."},
+                    {"q": "Çfarë është 'Firewall'?", "o": ["Filtër trafiku", "Hard disk"], "c": 0,
+                     "e": "Filtron trafikun drejt PC tuaj."},
+                    {"q": "Çfarë është 'DDoS'?", "o": ["Sulm mbingarkese", "Internet i shpejtë"], "c": 0,
+                     "e": "Rëzon faqet me trafik të lartë."},
+                    {"q": "Çfarë është 'Trojan'?", "o": ["Virus i maskuar", "Lojë"], "c": 0,
+                     "e": "Duket i dobishëm por është i rrezikshëm."},
+                    {"q": "Çfarë është 'Rootkit'?", "o": ["Virus me kontroll të plotë", "Riparim"], "c": 0,
+                     "e": "I jep hakerit qasje admini."},
+                    {"q": "Çfarë është 'Sandboxing'?", "o": ["Zonë prove izoluar", "Lojë"], "c": 0,
+                     "e": "Izolon virusin mos hapet."},
+                    {"q": "Çfarë është 'Ransomware'?", "o": ["Virus shantazhi", "Reklamë"], "c": 0,
+                     "e": "Bllokon skedarët për para."},
+                    {"q": "Çfarë është 'Menaxheri i Kodit'?", "o": ["Vendi sigurt i kodeve", "Virus"], "c": 0,
+                     "e": "Ruan fjalëkalimet e enkriptuara."},
+                    {"q": "A ju fsheh 'Incognito'?", "o": ["Jo nga hakerat", "Po, plotësisht"], "c": 0,
+                     "e": "Fsheh vetëm historinë lokale."},
+                    {"q": "Çfarë është 'Spear Phishing'?", "o": ["Sulm i synuar", "Sulm masiv"], "c": 0,
+                     "e": "Sulm ndaj një personi specifik."},
+                    {"q": "Çfarë është 'Pharming'?", "o": ["Ridrejtim faqesh", "Bujqësi"], "c": 0,
+                     "e": "Ju dërgon në faqe false pa dijeni."},
+                    {"q": "Çfarë është 'SQL Injection'?", "o": ["Sulm në databazë", "Virus disku"], "c": 0,
+                     "e": "Injektim kodi në baza të dhënash."},
+                    {"q": "Çfarë është 'Brute Force'?", "o": ["Gjetje kodesh", "Lloj procesori"], "c": 0,
+                     "e": "Provë me miliona kombinime."},
+                    {"q": "Çfarë është 'Man-in-the-Middle'?", "o": ["Ndërhyrje mesazhesh", "Lojë"], "c": 0,
+                     "e": "Haker që lexon mesazhet tuaja."},
+                    {"q": "Çfarë është 'Malware'?", "o": ["Softuer i dëmshëm", "Program i mirë"], "c": 0,
+                     "e": "Çdo program që dëmton PC-në."},
+                    {"q": "Çfarë është 'Patch'?", "o": ["Riparim softueri", "Foto"], "c": 0,
+                     "e": "Mbyll vrimat e sigurisë."},
+                    {"q": "Çfarë është 'Backup'?", "o": ["Kopje rezervë", "Fshirje"], "c": 0,
+                     "e": "Ju shpëton nëse humbni të dhënat."},
+                    {"q": "Çfarë është 'Cookie'?", "o": ["Të dhëna sesioni", "Virus"], "c": 0,
+                     "e": "Kujton cilësimet në faqe."},
+                    {"q": "Çfarë është 'VPN'?", "o": ["Rrjet privat", "Net i shpejtë"], "c": 0,
+                     "e": "Krijon tunel të sigurt të dhënash."},
+                    {"q": "Çfarë është 'Whaling'?", "o": ["Sulm ndaj drejtorëve", "Gjueti"], "c": 0,
+                     "e": "Phishing ndaj personave VIP."},
+                    {"q": "Çfarë është 'Honey Pot'?", "o": ["Kurth hakerash", "Mjaltë"], "c": 0,
+                     "e": "Sistem fals për të mashtruar hakerat."},
+                    {"q": "Çfarë është 'Dark Web'?", "o": ["Pjesë fshehur e netit", "Net pa ngjyra"], "c": 0,
+                     "e": "Pjesë që nuk gjenden në Google."},
+                    {"q": "Çfarë është 'Biometrika'?", "o": ["Shenjë gishtash/Fytyrë", "Matje"], "c": 0,
+                     "e": "Përdorimi i trupit për hyrje."},
+                    {"q": "Çfarë është 'Spam'?", "o": ["Postë padëshiruar", "Virus"], "c": 0,
+                     "e": "Mesazhe masive me reklama."},
+                    {"q": "Çfarë është 'IoT'?", "o": ["Pajisje smart", "Procesor"], "c": 0,
+                     "e": "Objekte të lidhura në internet."},
+                    {"q": "Çfarë është 'White Hat'?", "o": ["Haker etik", "Haker i dëmshëm"], "c": 0,
+                     "e": "Haker që ndihmon në siguri."},
+                    {"q": "Çfarë është 'Black Hat'?", "o": ["Haker dashakeq", "Fillestar"], "c": 0,
+                     "e": "Haker që vjedh për përfitim."},
+                    {"q": "Çfarë është 'Clickjacking'?", "o": ["Butona false", "Klikim shpejtë"], "c": 0,
+                     "e": "Ju mashtron të klikoni linqe fshehur."},
+                    {"q": "Çfarë është 'Malvertising'?", "o": ["Reklama rrezikshme", "Lajme"], "c": 0,
+                     "e": "Përhapje virusesh me reklama."},
+                    {"q": "Çfarë është vjedhja e të dhënave?", "o": ["Rrjedhje të dhënash", "Fshirje"], "c": 0,
+                     "e": "Kur të dhënat private bëhen publike."},
+                    {"q": "Fjalëkalim i keq është?", "o": ["Ditëlindja", "Kombinim shenjash"], "c": 0,
+                     "e": "Të dhënat e thjeshta gjehen shpejt."},
+                    {"q": "Çfarë bën antivirusi?", "o": ["Skanon dhe pastron", "Fshin skedarë"], "c": 0,
+                     "e": "Gjen dhe heq kodin e dëmshëm."},
+                    {"q": "Rreziku më i madh?", "o": ["Gabimi njerëzor", "PC i dobët"], "c": 0,
+                     "e": "Njerëzit manipulohen më lehtë."},
+                    {"q": "Çfarë është 'Shoulder Surfing'?", "o": ["Shikim mbi shpatull", "Sërfim"], "c": 0,
+                     "e": "Vjedhje kodi duke shikuar shkrimin."},
+                    {"q": "Çfarë është 'Cold Wallet'?", "o": ["Vendi offline i kripteve", "Kuletë ftohtë"], "c": 0,
+                     "e": "Mënyra më e sigurt për kripto."},
+                    {"q": "Çfarë është 'Script Kiddie'?", "o": ["Haker amator", "Fëmijë"], "c": 0,
+                     "e": "Përdor vegla pa dijeni."},
+                    {"q": "Çfarë është 'Logic Bomb'?", "o": ["Kod që pret ngjarje", "Eksploziv"], "c": 0,
+                     "e": "Virus që aktivizohet me kohë/ngjarje."},
+                    {"q": "Çfarë është 'Bug'?", "o": ["Gabim në kod", "Insekt"], "c": 0,
+                     "e": "Një anomali që mund të jetë rrezik."},
+                    {"q": "Çfarë është 'Phreaking'?", "o": ["Hakim telefonash", "Frikë"], "c": 0,
+                     "e": "Manipulim i rrjeteve telefonike."},
+                    {"q": "Çfarë është 'Exploit'?", "o": ["Përdorim i vrimës", "Riparim"], "c": 0,
+                     "e": "Vegël për hyrje nga vrima e sigurisë."},
+                    {"q": "Siguria dixhitale është?", "o": ["Kujdes i vazhdueshëm", "Detyrë një herë"], "c": 0,
+                     "e": "Duhet të jeni gjithmonë vigjilentë."}
                 ]
             },
             'TR': {
@@ -677,253 +915,344 @@ class QuizSystem:
                      "e": "PC çalınsa bile veriyi korur."},
                     {"q": "Dijital güvenlik eğitimi?", "o": ["Sürekli süreç", "Bir seferlik"], "c": 0,
                      "e": "Dünya değişiyor, güncel kalın."}
+                ],
+                "final": [
+                    {"q": "Juice Jacking nedir?", "o": ["Genel USB ile hırsızlık", "Hızlı şarj"], "c": 0,
+                     "e": "Genel USB portları virüs bulaştırabilir."},
+                    {"q": "Dijital Ayak İzi nedir?", "o": ["İnternetteki iz", "Veri boyutu"], "c": 0,
+                     "e": "Paylaştığınız her şey sonsuza dek kalır."},
+                    {"q": "Sıfır Gün (Zero-Day) nedir?", "o": ["Bilinmeyen açık", "Eski virüs"], "c": 0,
+                     "e": "Yama çıkmadan yapılan saldırıdır."},
+                    {"q": "Şifreleme (Encryption) nedir?", "o": ["Veriyi kodlama", "Silme"], "c": 0,
+                     "e": "Verileri hakerlar için okunmaz yapar."},
+                    {"q": "2FA nedir?", "o": ["Şifre + ek kod", "İki şifre"], "c": 0,
+                     "e": "Ek bir güvenlik katmanıdır."},
+                    {"q": "En güvenli Wi-Fi?", "o": ["WPA3", "WEP"], "c": 0,
+                     "e": "WPA3 en yeni güvenlik standardıdır."},
+                    {"q": "Sosyal Mühendislik nedir?", "o": ["İnsan manipülasyonu", "Programlama"], "c": 0,
+                     "e": "Sırları almak için yalan söyleme."},
+                    {"q": "Spyware nedir?", "o": ["İzleyen virüs", "Antivirüs"], "c": 0,
+                     "e": "İzinsiz aktivite kaydeder."},
+                    {"q": "Keylogger nedir?", "o": ["Tuş kaydeder", "Müzik çalar"], "c": 0,
+                     "e": "Yazarken şifreleri çalar."},
+                    {"q": "Botnet nedir?", "o": ["Zombi cihaz ağı", "İnternet türü"], "c": 0,
+                     "e": "Kitlesel saldırılar için kullanılır."},
+                    {"q": "Güvenlik Duvarı nedir?", "o": ["Trafik filtresi", "Hard disk"], "c": 0,
+                     "e": "PC'nize gelen trafiği filtreler."},
+                    {"q": "DDoS nedir?", "o": ["Aşırı yükleme", "Hızlı internet"], "c": 0,
+                     "e": "Siteyi sahte trafikle çökertir."},
+                    {"q": "Trojan nedir?", "o": ["Maskeli virüs", "Oyun"], "c": 0,
+                     "e": "Yararlı görünür ama tehlikelidir."},
+                    {"q": "Rootkit nedir?", "o": ["Tam kontrol virüsü", "Tamir seti"], "c": 0,
+                     "e": "Hacker'a admin yetkisi verir."},
+                    {"q": "Sandboxing nedir?", "o": ["İzole test alanı", "Oyun"], "c": 0,
+                     "e": "Virüs yayılımını engeller."},
+                    {"q": "Ransomware nedir?", "o": ["Fidye virüsü", "Reklam"], "c": 0,
+                     "e": "Dosyaları para için kilitler."},
+                    {"q": "Şifre Yöneticisi nedir?", "o": ["Şifre kasası", "Virüs"], "c": 0,
+                     "e": "Şifreleri kodlu saklar."},
+                    {"q": "Gizli Mod korur mu?", "o": ["Hackerlardan değil", "Evet, tam"], "c": 0,
+                     "e": "Sadece geçmişi yerel gizler."},
+                    {"q": "Spear Phishing nedir?", "o": ["Hedefli saldırı", "Genel saldırı"], "c": 0,
+                     "e": "Belirli bir kişiye yapılan saldırı."},
+                    {"q": "Pharming nedir?", "o": ["Site yönlendirme", "Tarım"], "c": 0,
+                     "e": "Sizi gizlice sahte siteye götürür."},
+                    {"q": "SQL Injection nedir?", "o": ["Veritabanı saldırısı", "Disk virüsü"], "c": 0,
+                     "e": "Veritabanına zararlı kod ekleme."},
+                    {"q": "Brute Force nedir?", "o": ["Şifre deneme", "İşlemci türü"], "c": 0,
+                     "e": "Milyonlarca kombinasyon denemesi."},
+                    {"q": "Aradaki Adam saldırısı?", "o": ["Mesaj yakalama", "Oyun"], "c": 0,
+                     "e": "Hacker'ın mesajları okuması."},
+                    {"q": "Malware nedir?", "o": ["Zararlı yazılım", "İyi program"], "c": 0,
+                     "e": "PC'ye zarar veren her program."},
+                    {"q": "Yama (Patch) nedir?", "o": ["Yazılım tamiri", "Resim"], "c": 0,
+                     "e": "Güvenlik açıklarını kapatır."},
+                    {"q": "Yedekleme (Backup) nedir?", "o": ["Veri kopyası", "Silme"], "c": 0,
+                     "e": "Veri kaybından kurtarır."},
+                    {"q": "Çerez (Cookie) nedir?", "o": ["Oturum verisi", "Virüs"], "c": 0,
+                     "e": "Site ayarlarını hatırlar."},
+                    {"q": "VPN nedir?", "o": ["Özel ağ", "Hızlı net"], "c": 0, "e": "Güvenli veri tüneli oluşturur."},
+                    {"q": "Whaling nedir?", "o": ["Yönetici saldırısı", "Avlanma"], "c": 0,
+                     "e": "VIP kişilere yapılan Phishing."},
+                    {"q": "Honey Pot nedir?", "o": ["Hacker tuzağı", "Bal"], "c": 0,
+                     "e": "Hacker'ı kandıran sahte sistem."},
+                    {"q": "Dark Web nedir?", "o": ["Gizli web kısmı", "Renksiz web"], "c": 0,
+                     "e": "Google'da çıkmayan kısımlar."},
+                    {"q": "Biyometri nedir?", "o": ["Parmak izi/Yüz", "Ölçüm"], "c": 0,
+                     "e": "Giriş için vücudu kullanma."},
+                    {"q": "Spam nedir?", "o": ["İstenmeyen posta", "Virüs"], "c": 0,
+                     "e": "Toplu reklam veya tuzak mesajlar."},
+                    {"q": "IoT nedir?", "o": ["Akıllı cihazlar", "İşlemci"], "c": 0, "e": "İnternete bağlı nesneler."},
+                    {"q": "Beyaz Şapka nedir?", "o": ["Etik hacker", "Zararlı hacker"], "c": 0,
+                     "e": "Güvenliğe yardım eden hacker."},
+                    {"q": "Siyah Şapka nedir?", "o": ["Kötü niyetli hacker", "Yeni"], "c": 0,
+                     "e": "Çıkarları için çalan hacker."},
+                    {"q": "Clickjacking nedir?", "o": ["Sahte butonlar", "Hızlı tık"], "c": 0,
+                     "e": "Gizli linke tıklatmayı sağlar."},
+                    {"q": "Malvertising nedir?", "o": ["Zararlı reklamlar", "Haber"], "c": 0,
+                     "e": "Reklamla virüs yayma."},
+                    {"q": "Veri İhlali nedir?", "o": ["Veri sızıntısı", "Silme"], "c": 0,
+                     "e": "Özel verilerin halka açılması."},
+                    {"q": "Kötü şifre nedir?", "o": ["Doğum günü", "Sembollü"], "c": 0,
+                     "e": "Basit veriler hemen tahmin edilir."},
+                    {"q": "Antivirüs ne yapar?", "o": ["Tarar ve temizler", "Dosya siler"], "c": 0,
+                     "e": "Zararlı kodu bulur ve kaldırır."},
+                    {"q": "En büyük risk?", "o": ["İnsan hatası", "Zayıf PC"], "c": 0,
+                     "e": "İnsanları manipüle etmek kolaydır."},
+                    {"q": "Shoulder Surfing nedir?", "o": ["Omuzdan bakma", "Sörf"], "c": 0,
+                     "e": "Yazarken şifreyi izleyerek çalma."},
+                    {"q": "Soğuk Cüzdan nedir?", "o": ["Çevrimdışı kripto", "Soğuk çanta"], "c": 0,
+                     "e": "Kripto için en güvenli yol."},
+                    {"q": "Script Kiddie nedir?", "o": ["Amatör hacker", "Çocuk"], "c": 0,
+                     "e": "Bilmeden hazır araç kullanır."},
+                    {"q": "Logic Bomb nedir?", "o": ["Olay bekleyen kod", "Patlayıcı"], "c": 0,
+                     "e": "Belli zamanda tetiklenen virüs."},
+                    {"q": "Bug nedir?", "o": ["Kod hatası", "Böcek"], "c": 0, "e": "Tehlikeli olabilecek bir hata."},
+                    {"q": "Phreaking nedir?", "o": ["Telefon hackleme", "Korku"], "c": 0,
+                     "e": "Telefon hatlarını manipüle etme."},
+                    {"q": "Exploit nedir?", "o": ["Açık kullanma", "Tamir"], "c": 0,
+                     "e": "Güvenlik açığından giriş aracı."},
+                    {"q": "Dijital güvenlik?", "o": ["Sürekli dikkat", "Tek seferlik"], "c": 0,
+                     "e": "Her zaman dikkatli olmalısınız."}
                 ]
             }
 
         }
 
-    def load_for_level(self, level, collected_lessons=None):
+    def load_for_level(self, level):
         lang = self.settings.language or 'MK'
         q_idx = self.questions_map.get(level, 1)
-
-        # Обиди се да вчиташ прашања за избраниот јазик
-        full_pool = self.all_questions.get(lang, {}).get(q_idx, [])
-
-        # Ако нема прашања за тој јазик, земи ги од Македонски како резерва (fallback)
-        if not full_pool:
-            full_pool = self.all_questions.get('MK', {}).get(q_idx, [])
-
-        self.questions_pool = list(full_pool)
-        random.shuffle(self.questions_pool)
-        self.used_questions = []
-        self.active = False
-        self.correct_answers_count = 0
+        if q_idx == "final":
+            full_pool = []
+            for i in [1, 2, 3]: full_pool.extend(self.all_questions.get(lang, {}).get(i, []))
+        else:
+            full_pool = self.all_questions.get(lang, {}).get(q_idx, [])
+        if not full_pool: full_pool = self.all_questions.get('MK', {}).get(q_idx if q_idx != "final" else 1, [])
+        self.questions_pool = list(full_pool); random.shuffle(self.questions_pool)
+        self.used_questions = []; self.active = False; self.correct_answers_count = 0
 
     def trigger_random(self):
-        # Филтрирај ги само неупотребените прашања
         avail = [q for q in self.questions_pool if q not in self.used_questions]
-
-        if not avail:
-            # Ако сите се искористени, ресетирај ја листата
-            self.used_questions = []
-            avail = self.questions_pool
-
+        if not avail: self.used_questions = []; avail = self.questions_pool
         if avail:
             self.current_q = random.choice(avail)
             self.used_questions.append(self.current_q)
-            self.active = True
-            self.showing_feedback = False
+            self.active = True; self.showing_feedback = False
 
-    # Во ui_manager.py во методот _check на класата QuizSystem:
     def _check(self, idx):
         self.correct = (idx == self.current_q["c"])
         if self.correct:
             self.correct_answers_count += 1
-            # Секој точен одговор прави 10 штета (Вкупно 50 од квизот)
-            self.settings.pending_boss_damage = 10
+            # МАТЕМАТИЧКА КОРЕКЦИЈА ЗА НИВО 7
+            if self.settings.current_level == 7:
+                # 3000 HP / 30 прашања = ТОЧНО 100 штета по прашање
+                self.settings.pending_boss_damage = 100
+            else:
+                self.settings.pending_boss_damage = 10
         else:
             self.settings.shields = max(0, self.settings.shields - 1)
         self.showing_feedback = True
 
     def draw(self):
         if not self.active: return
-
-        # Позадински слој (overlay)
-        ov = pygame.Surface((900, 700), pygame.SRCALPHA)
-        ov.fill((0, 0, 0, 240))
-        self.screen.blit(ov, (0, 0))
-
+        ov = pygame.Surface((900, 700), pygame.SRCALPHA); ov.fill((0, 0, 0, 240)); self.screen.blit(ov, (0, 0))
         font = pygame.font.Font(self.settings.font_path, 16)
-        # Главен панел за квизот
         pygame.draw.rect(self.screen, (255, 255, 255), (100, 150, 700, 420), border_radius=15)
-
-        # 1. ДИНАМИЧНИ ПРЕВОДИ
         lang = self.settings.language or 'MK'
-
-        # Преводи за прогрес барот (ТОЧНИ: 0/5)
-        correct_labels = {
-            'MK': "ТОЧНИ", 'EN': "CORRECT", 'AL': "TË SAKTA", 'TR': "DOĞRU"
-        }
-
-        # Преводи за "ИНФО:"
-        info_labels = {
-            'MK': "ИНФО:", 'EN': "INFO:", 'AL': "INFO:", 'TR': "BİLGİ:"
-        }
-
-        # Преводи за статус (ТОЧНО/ГРЕШНО)
-        status_labels = {
-            'MK': ("ТОЧНО!", "ГРЕШНО!"),
-            'EN': ("CORRECT!", "WRONG!"),
-            'AL': ("E SAKTË!", "GABIM!"),
-            'TR': ("DOĞRU!", "YANLIŞ!")
-        }
-
-        label = correct_labels.get(lang, "CORRECT")
-        info_text = info_labels.get(lang, "INFO:")
-        correct_status, wrong_status = status_labels.get(lang, ("CORRECT!", "WRONG!"))
-
-        # Приказ на прогресот во горниот лев агол на панелот
-        limit = 5 if self.settings.current_level == 2 else 10 if self.settings.current_level == 4 else 15
+        correct_labels = {'MK': "ТОЧНИ", 'EN': "CORRECT", 'AL': "TË SAKTA", 'TR': "DOĞRU"}
+        info_labels = {'MK': "ИНФО:", 'EN': "INFO:", 'AL': "INFO:", 'TR': "BİLGİ:"}
+        status_labels = {'MK': ("ТОЧНО!", "ГРЕШНО!"), 'EN': ("CORRECT!", "WRONG!"), 'AL': ("E SAKTË!", "GABIM!"), 'TR': ("DOĞRU!", "YANLIŞ!")}
+        label = correct_labels.get(lang, "CORRECT"); info_text = info_labels.get(lang, "INFO:")
+        c_status, w_status = status_labels.get(lang, ("CORRECT!", "WRONG!"))
+        limit = 30 if self.settings.current_level == 7 else 15 if self.settings.current_level == 6 else 10 if self.settings.current_level == 4 else 5
         prog = f"{label}: {self.correct_answers_count}/{limit}"
         self.screen.blit(font.render(prog, True, (0, 0, 150)), (130, 170))
-
-        # 2. ПРИКАЗ НА ПРАШАЊА ИЛИ ФИДБЕК
         if not self.showing_feedback:
-            # Цртање на прашањето
             draw_text_wrapped(self.screen, self.current_q["q"], 130, 210, 640, font, (0, 0, 0))
-
-            # Цртање на опциите (копчињата)
             for i, opt in enumerate(self.current_q["o"]):
-                r = pygame.Rect(130, 320 + i * 80, 640, 60)
-                pygame.draw.rect(self.screen, (100, 150, 255), r, border_radius=10)
+                r = pygame.Rect(130, 320 + i * 80, 640, 60); pygame.draw.rect(self.screen, (100, 150, 255), r, border_radius=10)
                 self.screen.blit(font.render(f"{i + 1}. {opt}", True, (255, 255, 255)), (150, 335 + i * 80))
         else:
-            # Цртање на фидбекот по одговорено прашање
-            if self.correct:
-                display_status = correct_status
-                color = (0, 150, 0)  # Зелена за точно
-            else:
-                display_status = wrong_status
-                color = (200, 0, 0)  # Црвена за грешно
-
-            # Статус (ТОЧНО! / ГРЕШНО!)
-            self.screen.blit(font.render(display_status, True, color), (130, 210))
-
-            # Наслов "ИНФО:"
+            color = (0, 150, 0) if self.correct else (200, 0, 0)
+            self.screen.blit(font.render(c_status if self.correct else w_status, True, color), (130, 210))
             self.screen.blit(font.render(info_text, True, (0, 0, 0)), (130, 250))
-
-            # Објаснување на лекцијата
             draw_text_wrapped(self.screen, self.current_q["e"], 130, 290, 640, font, (30, 30, 30))
-
-            # Инструкција за продолжување на дното
             cont = self.settings.translations[lang]['press_space']
             self.screen.blit(font.render(cont, True, (150, 0, 0)), (130, 520))
 
     def handle_event(self, event):
         if not self.active: return
-        if self.showing_feedback and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            self.active = False
+        if self.showing_feedback and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: self.active = False
         elif not self.showing_feedback and event.type == pygame.MOUSEBUTTONDOWN:
             for i in range(len(self.current_q.get("o", []))):
                 if pygame.Rect(130, 320 + i * 80, 640, 60).collidepoint(event.pos): self._check(i)
 
-
 def draw_text_wrapped(screen, text, x, y, max_w, font, color):
-    words = text.split(' ');
-    line = "";
-    curr_y = y
+    words = text.split(' '); line = ""; curr_y = y
     for word in words:
-        if font.size(line + word)[0] < max_w:
-            line += word + " "
-        else:
-            screen.blit(font.render(line, True, color), (x, curr_y))
-            curr_y += font.get_linesize() + 5
-            line = word + " "
-    screen.blit(font.render(line, True, color), (x, curr_y))
-    return curr_y
-
+        if font.size(line + word)[0] < max_w: line += word + " "
+        else: screen.blit(font.render(line, True, color), (x, curr_y)); curr_y += font.get_linesize() + 5; line = word + " "
+    screen.blit(font.render(line, True, color), (x, curr_y)); return curr_y
 
 class Boss(pygame.sprite.Sprite):
     def __init__(self, settings, level=1):
         super().__init__()
         self.settings = settings
         self.level = level
-
-        # ДЕФИНИРАЊЕ НА target_y (ова ја решава грешката)
         self.target_y = 80
-
-        # Здравје според нивото
-        self.max_hp = 100 if level == 2 else 200 if level == 4 else 300
+        self.max_hp = 100 if level == 2 else 200 if level == 4 else 300 if level == 6 else 3000
         self.current_hp = self.max_hp
         self.t = 0.0
-
         try:
-            img = pygame.image.load(os.path.join('assets', 'monster1.png')).convert_alpha()
+            img = pygame.image.load(os.path.join('assets', 'monster4.png')).convert_alpha() if level==2 else pygame.image.load(os.path.join('assets', 'monster1.png')).convert_alpha() if level==4 else pygame.image.load(os.path.join('assets', 'monster2.png')).convert_alpha() if level==6 else pygame.image.load(os.path.join('assets', 'monster3.png')).convert_alpha()
             self.image = pygame.transform.scale(img, (180, 180))
-        except:
-            self.image = pygame.Surface((150, 150))
-            self.image.fill((150, 0, 0))
-
+        except: self.image = pygame.Surface((150, 150)); self.image.fill((150, 0, 0))
         self.rect = self.image.get_rect(center=(450, -100))
 
+    # Во ui_manager.py, Boss.update
     def update(self, player_x):
-        # Прво се спушта до својата позиција (target_y)
         if self.rect.y < self.target_y:
             self.rect.y += 2
         else:
-            # ДИНАМИЧНА БРЗИНА И ДВИЖЕЊЕ:
-            # Ниво 2: 0.02
-            # Ниво 4: 0.04
-            # Ниво 6: 0.06
-            speed_factor = 0.02 + (self.level - 2) * 0.01
+            # Екстремна брзина за финалната битка
+            speed_factor = 0.08 if self.level == 7 else 0.02 + (self.level - 2) * 0.01
             self.t += speed_factor
-
-            # Амплитуда (замав)
-            amplitude = 200 + (self.level * 10)
-
-            # Синусоидно движење лево-десно
+            amplitude = 250 if self.level == 7 else 200 + (self.level * 10)
             self.rect.x = 360 + math.sin(self.t) * amplitude
 
     def draw(self, screen):
-        screen.blit(self.image, self.rect)
-        pygame.draw.rect(screen, (50, 50, 50), (300, 20, 300, 15))
-        pygame.draw.rect(screen, (255, 0, 0), (300, 20, (max(0, self.current_hp) / self.max_hp) * 300, 15))
-
+        screen.blit(self.image, self.rect); pygame.draw.rect(screen, (50, 50, 50), (300, 50, 300, 15))
+        pygame.draw.rect(screen, (255, 0, 0), (300, 50, (max(0, self.current_hp) / self.max_hp) * 300, 15))
 
 def draw_knowledge_summary(screen, settings, knowledge_list):
     lang = settings.language or 'MK'
-    overlay = pygame.Surface((900, 700), pygame.SRCALPHA);
-    overlay.fill((0, 20, 60, 245));
-    screen.blit(overlay, (0, 0))
-    pygame.draw.rect(screen, (255, 255, 255), (30, 30, 840, 640), border_radius=15)
-    pygame.draw.rect(screen, (255, 215, 0), (30, 30, 840, 640), width=5, border_radius=15)
-
-    font_t = pygame.font.Font(settings.font_path, 18);
-    font_s = pygame.font.Font(settings.font_path, 9)
-
-    # ДИНАМИЧЕН ПРЕВОД НА НАСЛОВОТ
-    summary_titles = {
-        'MK': "РЕЗИМЕ НА ЗНАЕЊЕТО",
-        'EN': "KNOWLEDGE SUMMARY",
-        'AL': "PËRMBLEDHJA E NJOHURIVE",
-        'TR': "BİLGİ ÖZETİ"
-    }
-    title_text = summary_titles.get(lang, summary_titles['EN'])
-
-    # Цртање на насловот на средина
-    title_surf = font_t.render(title_text, True, (0, 0, 100))
-    screen.blit(title_surf, (450 - title_surf.get_width() // 2, 50))
-
-    # Приказ во две колони (по 8 лекции во колона за читливост)
-    for i, lesson in enumerate(knowledge_list):
-        col = 0 if i < 8 else 1
-        row = i % 8
-        x = 65 if col == 0 else 465
-        y_pos = 110 + row * 65
-
-        # Маркер
-        pygame.draw.circle(screen, (255, 140, 0), (x - 15, y_pos + 5), 4)
-        draw_text_wrapped(screen, lesson, x, y_pos, 360, font_s, (30, 30, 30))
-
-    # Превод за пораката на дното (Space)
-    space_txt = settings.translations[lang]['press_space']
-    screen.blit(font_s.render(space_txt, True, (200, 0, 0)), (450 - font_s.size(space_txt)[0] // 2, 645))
-
+    pages = [knowledge_list[i:i + 16] for i in range(0, len(knowledge_list), 16)]
+    if not pages: pages = [[]]
+    for p_idx, current_page in enumerate(pages):
+        overlay = pygame.Surface((900, 700), pygame.SRCALPHA); overlay.fill((0, 20, 60, 245)); screen.blit(overlay, (0, 0))
+        pygame.draw.rect(screen, (255, 255, 255), (30, 30, 840, 640), border_radius=15)
+        pygame.draw.rect(screen, (255, 215, 0), (30, 30, 840, 640), width=5, border_radius=15)
+        font_t = pygame.font.Font(settings.font_path, 18); font_s = pygame.font.Font(settings.font_path, 9)
+        summary_titles = {'MK': "РЕЗИМЕ НА ЗНАЕЊЕТО", 'EN': "KNOWLEDGE SUMMARY", 'AL': "PËRMBLEDHJA E NJOHURIVE", 'TR': "BİLGİ ÖZETİ"}
+        title_text = f"{summary_titles.get(lang, 'KNOWLEDGE SUMMARY')} ({p_idx+1}/{len(pages)})"
+        title_surf = font_t.render(title_text, True, (0, 0, 100))
+        screen.blit(title_surf, (450 - title_surf.get_width() // 2, 50))
+        for i, lesson in enumerate(current_page):
+            col, row = i // 8, i % 8
+            x, y_pos = (65 if col == 0 else 465), 110 + row * 65
+            pygame.draw.circle(screen, (255, 140, 0), (x - 15, y_pos + 5), 4)
+            draw_text_wrapped(screen, lesson, x, y_pos, 360, font_s, (30, 30, 30))
+        space_txt = settings.translations[lang]['press_space']
+        screen.blit(font_s.render(space_txt, True, (200, 0, 0)), (450 - font_s.size(space_txt)[0] // 2, 645))
+        pygame.display.flip()
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: waiting = False
+                if event.type == pygame.QUIT: pygame.quit(); sys.exit()
 
 def draw_victory_screen(screen, settings):
-    screen.fill((0, 40, 0));
-    f = pygame.font.Font(settings.font_path, 20)
+    screen.fill((0, 40, 0)); f = pygame.font.Font(settings.font_path, 20)
     msg = settings.translations[settings.language]['victory_msg']
     screen.blit(f.render(msg, True, (255, 255, 0)), (450 - f.size(msg)[0] // 2, 350))
 
-
 def draw_level_complete(screen, settings):
     lang = settings.language or 'MK'
-    # Го влече текстот "НИВО {} ЗАВРШЕНО! ОДИМЕ ПОНАТАМУ!"
     msg = settings.translations[lang].get('level_up', "LEVEL COMPLETE").format(settings.current_level)
-
     font = pygame.font.Font(settings.font_path, 22)
-    txt_surf = font.render(msg, True, (0, 255, 0))  # Зелена боја
-
-    # Се црта на средина на екранот
+    txt_surf = font.render(msg, True, (0, 255, 0))
     screen.blit(txt_surf, (450 - txt_surf.get_width() // 2, 350))
+
+
+def draw_victory_screen(screen, settings, all_lessons):
+    lang = settings.language or 'MK'
+    # Делење на сите лекции на страници за крајниот преглед (по 12 на страница)
+    pages = [all_lessons[i:i + 12] for i in range(0, len(all_lessons), 12)]
+    if not pages: pages = [[]]
+
+    for p_idx, current_page in enumerate(pages):
+        # Позадина: Темно зелена за победничка атмосфера
+        screen.fill((0, 40, 0))
+        f_title = pygame.font.Font(settings.font_path, 22)
+        f_text = pygame.font.Font(settings.font_path, 10)
+
+        # 1. Главна порака за победа (од settings.py)
+        msg = settings.translations[lang]['victory_msg']
+        title_surf = f_title.render(msg, True, (255, 255, 0))  # Жолта боја
+        screen.blit(title_surf, (450 - title_surf.get_width() // 2, 50))
+
+        # 2. Поднаслов за листа на вештини со индикатор за страница
+        sub_titles = {
+            'MK': "ЛИСТА НА ТВОИТЕ САЈБЕР ВЕШТИНИ:",
+            'EN': "YOUR CYBER SKILLS LIST:",
+            'AL': "LISTA E SHKATHTËSIVE TUAJA KIBERNETIKE:",
+            'TR': "SİBER YETENEK LİSTENİZ:"
+        }
+
+        # Прикажи го индикаторот за страница само ако има повеќе од една страница
+        sub_label = sub_titles.get(lang, '')
+        if len(pages) > 1:
+            sub_text = f"{sub_label} ({p_idx + 1}/{len(pages)})"
+        else:
+            sub_text = sub_label
+
+        sub_surf = f_text.render(sub_text, True, (255, 255, 255))
+        screen.blit(sub_surf, (450 - sub_surf.get_width() // 2, 100))
+
+        # 3. Исцртување на собраните лекции
+        for i, lesson in enumerate(current_page):
+            y_pos = 150 + i * 40
+            # Се користи draw_text_wrapped за долгите реченици
+            draw_text_wrapped(screen, f"• {lesson}", 100, y_pos, 700, f_text, (200, 255, 200))
+
+        # 4. Порака за продолжување на дното
+        exit_msg = settings.translations[lang]['press_space']
+        exit_surf = f_text.render(exit_msg, True, (255, 255, 255))
+        screen.blit(exit_surf, (450 - exit_surf.get_width() // 2, 650))
+
+        pygame.display.flip()
+
+        # Блокирачки циклус кој чека играчот да притисне SPACE за следна страна
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    waiting = False
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+def draw_victory_congratulations(screen, settings):
+    lang = settings.language or 'MK'
+    screen.fill((0, 50, 0))
+    f_big = pygame.font.Font(settings.font_path, 20) # Малку помал фонт за да собере
+    f_small = pygame.font.Font(settings.font_path, 14)
+
+    # 1. Порака за честитки - СОВРШЕНО ЦЕНТРИРАНА
+    msg = settings.translations[lang]['victory_msg']
+    title_surf = f_big.render(msg, True, (255, 255, 0))
+    title_rect = title_surf.get_rect(center=(450, 200)) # Центрирање по X и Y
+    screen.blit(title_surf, title_rect)
+
+    options = {
+        'MK': ["Притисни SPACE за знаења", "Притисни 'R' за рестарт", "Притисни ESC за излез"],
+        'EN': ["Press SPACE for knowledge", "Press 'R' to restart", "Press ESC to exit"],
+        'AL': ["Shtyp SPACE për njohuritë", "Shtyp 'R' për restart", "Shtyp ESC për dalje"],
+        'TR': ["Bilgi için SPACE'e bas", "Yeniden başlatmak için 'R'ye bas", "Çıkmak için ESC'ye bas"]
+    }
+
+    # 2. Опции - ЦЕНТРИРАНИ
+    lines = options.get(lang, options['EN'])
+    for i, line in enumerate(lines):
+        txt_surf = f_small.render(line, True, (255, 255, 255))
+        txt_rect = txt_surf.get_rect(center=(450, 400 + i * 60))
+        screen.blit(txt_surf, txt_rect)
+
+    pygame.display.flip()
+    while True:  # Внимавајте на латиницата тука!
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: return "QUIT"
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE: return "SHOW_SKILLS"
+                if event.key == pygame.K_r: return "RESTART"
+                if event.key == pygame.K_ESCAPE: return "QUIT"
