@@ -21,3 +21,6 @@ SFX: <br>
 Музика: https://www.epidemicsound.com/music/tracks/d7f0289f-f59b-3cb0-8c54-f57d87c4e89d/ <br>
 Собирање токен: https://www.epidemicsound.com/sound-effects/tracks/8c1d15d0-5d14-48e6-864a-8b485ac80029/ <br>
 Звукот за ласерот: https://www.epidemicsound.com/sound-effects/tracks/f08f4ea3-5d22-4404-a65a-36ad233a190f/ <br>
+Убивање на непријател: https://www.epidemicsound.com/sound-effects/tracks/708876e5-66eb-4f57-a8ec-ab9ce4a15a7f/ <br>
+Екстра живот: https://www.epidemicsound.com/sound-effects/tracks/3db0fac8-6ff1-4460-834c-2bd07ec13804/ <br>
+Играчот губи живот: https://www.epidemicsound.com/sound-effects/tracks/e6d4b172-0908-49eb-8b7b-34bfdc859b73/
