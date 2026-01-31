@@ -17,3 +17,7 @@
 -   Вирѕсите од нивоа 4,6 и 7: https://lunascra.itch.io/50-rpg-dungeon-monsters-pixel-art-enemy-pack<br>
 -   Леталата: https://realcreative.itch.io/pixel-art-space-game-asset-pack <br>
 Спрајт за токенот: https://gentlecatstudio.itch.io/rpg-items
+SFX: <br>
+Музика: https://www.epidemicsound.com/music/tracks/d7f0289f-f59b-3cb0-8c54-f57d87c4e89d/ <br>
+Собирање токен: https://www.epidemicsound.com/sound-effects/tracks/8c1d15d0-5d14-48e6-864a-8b485ac80029/ <br>
+Звукот за ласерот: https://www.epidemicsound.com/sound-effects/tracks/f08f4ea3-5d22-4404-a65a-36ad233a190f/ <br>
