@@ -251,36 +251,32 @@ def main():
     }
 
     knowledge_pool = []
-    collected_lessons = []
-    all_lessons = []
+    collected_lessons = []  # Лекции за тековно ниво
+    all_lessons = []  # Сите собрани лекции за финалното резиме
 
     def refresh_knowledge():
         nonlocal knowledge_pool
         lang = configs.language or 'MK'
         lvl = configs.current_level
+        # Прво пробај го избраниот јазик
         pool_source = knowledge_by_lang.get(lang, knowledge_by_lang['MK'])
-        knowledge_pool = list(pool_source.get(lvl, []))
+
+        # Ако листата за тоа ниво е празна, земи ја од MK како резерва
+        current_list = pool_source.get(lvl, [])
+        if not current_list and lang != 'MK':
+            current_list = knowledge_by_lang['MK'].get(lvl, [])
+
+        knowledge_pool = list(current_list)
         random.shuffle(knowledge_pool)
-
-    def wait_transition(ms=1000):
-        """Small delay that still pumps events so the window doesn't freeze."""
-        start = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start < ms:
-            for e in pygame.event.get():
-                if e.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-            pygame.display.flip()
-            clock.tick(60)
-
 
     def init_game():
         p = Player(configs)
-        if configs.current_level % 2 != 0: refresh_knowledge()
+        if configs.current_level % 2 != 0 and configs.current_level < 7:
+            refresh_knowledge()
+        q_sys = QuizSystem(screen, configs)
+        q_sys.load_for_level(configs.current_level)
         return p, pygame.sprite.Group(p), pygame.sprite.Group(), pygame.sprite.Group(), \
-            pygame.sprite.Group(), QuizSystem(screen, configs), None
-
-
+            pygame.sprite.Group(), q_sys, None
 
     player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
     configs.boss_active = False
@@ -304,10 +300,7 @@ def main():
                     if event.key in keys:
                         configs.language = keys[event.key]
                         configs.show_language_selection = False
-
-                        # Ова ги полни questions_pool и used_questions
                         quiz.load_for_level(configs.current_level)
-
                         refresh_knowledge()
                         pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
             continue
@@ -316,32 +309,25 @@ def main():
         bg.draw(screen)
         lang_ref = configs.translations.get(configs.language or 'MK', configs.translations['EN'])
 
-        # 2. Настани (Events)
+        # 2. Настани
         for event in pygame.event.get():
             if event.type == pygame.QUIT: pygame.quit(); sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 configs.reset_game()
                 collected_lessons = []
                 all_lessons = []
-
                 player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
                 pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 paused = not paused
-                if paused:
-                    # stop enemy spawn timer
-                    pygame.time.set_timer(SPAWN_ENEMY, 0)
-                else:
-                    # resume enemy spawn timer (only if not boss level)
-                    if not configs.boss_active:
-                        pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
-                continue
-            if not quiz.active and configs.game_active:
+                pygame.time.set_timer(SPAWN_ENEMY, 0 if paused else ENEMY_SPAWN_MS)
+
+            if not quiz.active and configs.game_active and not paused:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     if not configs.show_instructions:
                         b = Bullet(player.rect.centerx, player.rect.top, configs)
-                        bullets.add(b);
+                        bullets.add(b)
                         all_sprites.add(b)
                 if event.type == SPAWN_ENEMY and not configs.boss_active:
                     enemies.add(Enemy(configs, random.random() < (0.2 + configs.current_level * 0.05)))
@@ -349,22 +335,21 @@ def main():
             quiz.handle_event(event)
 
         if paused:
-            # затемнување
-            ov = pygame.Surface((configs.screen_width, configs.screen_height), pygame.SRCALPHA)
+            # 1. Затемнување на заднината
+            ov = pygame.Surface((900, 700), pygame.SRCALPHA)
             ov.fill((0, 0, 0, 200))
             screen.blit(ov, (0, 0))
 
-            # наслов
-            font = pygame.font.Font(configs.font_path, 18)
-            title = font.render("PAUSED - Press P to continue", True, (255, 255, 255))
-            screen.blit(title, (configs.screen_width // 2 - title.get_width() // 2, 30))
+            # 2. Приказ на сите собрани лекции
             draw_knowledge_summary(screen, configs, all_lessons)
 
-            pygame.display.flip()
-            clock.tick(60)
+            # 3. Важно: По затворање на резимето (преку SPACE внатре во функцијата),
+            # автоматски исклучи ја паузата и врати го тајмерот
+            paused = False
+            if not configs.boss_active:
+                pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
             continue
 
-        # 3. Инструкции
         if configs.show_instructions:
             draw_detailed_level_intro(screen, configs)
             pygame.display.flip()
@@ -374,7 +359,7 @@ def main():
                     configs.show_instructions = False
             continue
 
-        # 4. Главна Логика
+        # 3. Главна Логика
         if configs.game_active:
             if not quiz.active:
                 player.update(pygame.key.get_pressed())
@@ -383,60 +368,39 @@ def main():
                 drops.update()
 
                 # --- НИВОА СО СОБИРАЊЕ (1, 3, 5) ---
-                # --- НИВОА СО СОБИРАЊЕ (1, 3, 5) ---
-                if configs.current_level % 2 != 0:
-                    if pygame.sprite.spritecollide(player, enemies, True):
-                        configs.shields -= 1
+                if configs.current_level % 2 != 0 and configs.current_level < 7:
 
+                    if pygame.sprite.spritecollide(player, enemies, True): configs.shields -= 1
                     for d in pygame.sprite.spritecollide(player, drops, True):
                         if knowledge_pool:
-                            knowledge_msg = d.text
-                            collected_lessons.append(knowledge_msg)
-                            all_lessons.append(knowledge_msg)
+                            txt = d.text
+                            knowledge_msg = txt
+                            collected_lessons.append(txt)
+                            all_lessons.append(txt)
                             msg_timer = 200
-                            configs.knowledge_points += 1  #
+                            configs.knowledge_points += 1
 
-                    # ОДРЕДУВАЊЕ НА ЦЕЛТА
                     target_k = 5 if configs.current_level == 1 else 10 if configs.current_level == 3 else 15
-
-                    # ПРОВЕРКА ДАЛИ Е ДОСТИГНАТА ЦЕЛТА
                     if configs.knowledge_points >= target_k:
-                        # 1. Прво прикажи го резимето (Knowledge Summary)
                         draw_knowledge_summary(screen, configs, collected_lessons)
-                        pygame.display.flip()
-
-                        # 2. Чекај играчот да притисне SPACE за да продолжи
-                        wait = True
-                        while wait:
-                            for e in pygame.event.get():
-                                if e.type == pygame.KEYDOWN and e.key == pygame.K_SPACE:
-                                    wait = False
-                                if e.type == pygame.QUIT:
-                                    pygame.quit()
-                                    sys.exit()
-
-                        # 3. ДУРИ СЕГА ОДИ НА СЛЕДНО НИВО
-                        knowledge_msg = ""
                         configs.next_level()
-                        configs.knowledge_points = 0  # Ресетирај за следното собирање
+                        configs.knowledge_points = 0
                         configs.show_instructions = True
+                        knowledge_msg = ""
                         collected_lessons = []
-
-                        # Чистење на екранот и ресетирање објекти
-                        enemies.empty()
-                        bullets.empty()
-                        drops.empty()
                         player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
                         quiz.load_for_level(configs.current_level)
-                        pygame.time.set_timer(SPAWN_ENEMY, 0 if configs.boss_active else ENEMY_SPAWN_MS)
 
-
-
-                # --- БОС НИВОА (2, 4, 6) ---
+                # --- БОС НИВОА (2, 4, 6, 7) ---
                 else:
                     if not configs.boss_active:
+
+                        if configs.current_level == 7:
+                            draw_knowledge_summary(screen, configs, all_lessons)
+
                         configs.boss_active = True
                         boss = Boss(configs, configs.current_level)
+
                     if boss:
                         boss.update(player.rect.centerx)
                         if getattr(configs, "pending_boss_damage", 0) > 0:
@@ -444,54 +408,67 @@ def main():
                             configs.pending_boss_damage = 0
 
                         if pygame.sprite.spritecollide(boss, bullets, True):
-                            if boss.current_hp > 10: boss.current_hp -= 2
+                            # Ако е ниво 7, куршумите само го активираат квизот, но не го убиваат босот
+                            if configs.current_level == 7:
+                                if boss.current_hp > 500:
+                                    pass
+                            else:
+                                if boss.current_hp > 10: boss.current_hp -= 2  # Стандардна штета за нивоа 2, 4, 6
+
                             hit_counter += 1
                             if hit_counter >= 5:
-                                hit_counter = 0;
+                                hit_counter = 0
                                 quiz.trigger_random()
 
+                        # Проверка за победа на квизот
+                        limit = 30 if configs.current_level == 7 else 15 if configs.current_level == 6 else 10 if configs.current_level == 4 else 5
+                        if quiz.correct_answers_count >= limit: boss.current_hp = 0
+
                         if boss.current_hp <= 0:
-                            if configs.current_level >= 6:
-                                configs.victory = True;
+                            if configs.current_level >= 7:
+                                configs.victory = True
                                 configs.game_active = False
                             else:
                                 draw_level_complete(screen, configs)
                                 pygame.display.flip()
                                 pygame.time.wait(2000)
                                 configs.next_level()
-                                configs.show_instructions = True
-                                player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
-                                all_lessons = []
 
-                # --- ПУКАЊЕ ВО ОБИЧНИ НЕПРИЈАТЕЛИ ---
+                                configs.show_instructions = True
+                                knowledge_msg = ""
+
+                                player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+                                quiz.load_for_level(configs.current_level)
+
+                # --- УНИШТУВАЊЕ НЕПРИЈАТЕЛИ & БОНУС ЖИВОТ ---
                 for b in bullets:
                     hits = pygame.sprite.spritecollide(b, enemies, False)
                     for e in hits:
-                        e.hp -= 1;
+                        e.hp -= 1
                         b.kill()
                         if e.hp <= 0:
                             if e.is_special and configs.current_level % 2 != 0:
                                 drop = KnowledgeDrop(e.rect.centerx, e.rect.centery, knowledge_pool)
-                                drops.add(drop);
+                                drops.add(drop)
                                 all_sprites.add(drop)
                                 configs.score += 30
                             else:
                                 configs.score += 10
 
-                            # БОНУС ЖИВОТ НА 250 ПОЕНИ
                             if configs.score // 250 > configs.last_life_score // 250:
                                 configs.shields += 1
                                 configs.last_life_score = (configs.score // 250) * 250
+                                knowledge_msg = "BONUS: +1 LIFE!"
+                                msg_timer = 150
                             e.kill()
 
-            # 5. Цртање (Drawing)
-            all_sprites.draw(screen);
-            enemies.draw(screen);
+            # 4. Цртање
+            all_sprites.draw(screen)
+            enemies.draw(screen)
             drops.draw(screen)
             if boss: boss.draw(screen)
 
-            # HUD
-            if boss:
+            if boss or configs.current_level == 7:
                 hud_txt = lang_ref['hud_boss'].format(configs.current_level, configs.shields, configs.score)
             else:
                 target_val = 5 if configs.current_level == 1 else 10 if configs.current_level == 3 else 15
@@ -499,23 +476,39 @@ def main():
                                                  f"{configs.knowledge_points}/{target_val}")
 
             screen.blit(f_hud.render(hud_txt, True, (255, 255, 255)), (20, 20))
-            if msg_timer > 0 and configs.current_level % 2 != 0:
+            if msg_timer > 0:
                 txt_s = f_hud.render(knowledge_msg, True, (255, 215, 0))
-                screen.blit(txt_s, (450 - txt_s.get_width() // 2, 610));
+                screen.blit(txt_s, (450 - txt_s.get_width() // 2, 610))
                 msg_timer -= 1
 
             quiz.draw()
             if configs.shields <= 0: configs.game_active = False
         else:
-            # Game Over / Victory
             if configs.victory:
-                draw_victory_screen(screen, configs)
+                # 1. Прикажи го екранот со честитки и земи го изборот на играчот
+                choice = draw_victory_congratulations(screen, configs)
+
+                if choice == "SHOW_SKILLS":
+                    # 2. Ако притиснал SPACE, прикажи ги вештините (all_lessons)
+                    draw_victory_screen(screen, configs, all_lessons)
+                    pygame.quit()
+                    sys.exit()
+                elif choice == "RESTART":
+                    # 3. Рестартирај ја играта
+                    configs.reset_game()
+                    all_lessons = []
+                    collected_lessons = []
+                    player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+                else:
+                    # 4. Излези од играта
+                    pygame.quit()
+                    sys.exit()
             else:
-                ov = pygame.Surface((900, 700), pygame.SRCALPHA);
-                ov.fill((0, 0, 0, 220));
+                # Game Over логика
+                ov = pygame.Surface((900, 700), pygame.SRCALPHA)
+                ov.fill((0, 0, 0, 220))
                 screen.blit(ov, (0, 0))
                 screen.blit(f_hud.render(lang_ref['game_over'], True, (255, 255, 255)), (150, 350))
-
         pygame.display.flip()
 
 
