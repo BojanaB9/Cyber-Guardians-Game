@@ -293,6 +293,7 @@ def main():
             pygame.sprite.Group(), q_sys, None
 
     player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+    boss_bullets = pygame.sprite.Group()
     configs.boss_active = False
     SPAWN_ENEMY = pygame.USEREVENT + 1
     ENEMY_SPAWN_MS = 1000
@@ -331,6 +332,7 @@ def main():
                 collected_lessons = []
                 all_lessons = []
                 player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+                boss_bullets.empty()
                 pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
@@ -381,6 +383,7 @@ def main():
                 bullets.update()
                 enemies.update()
                 drops.update()
+                boss_bullets.update()
 
                 # --- НИВОА СО СОБИРАЊЕ (1, 3, 5) ---
                 if configs.current_level % 2 != 0 and configs.current_level < 7:
@@ -421,6 +424,20 @@ def main():
 
                     if boss:
                         boss.update(player.rect.centerx)
+                        current_time = pygame.time.get_ticks()
+
+                        if current_time - boss.last_shot_time > boss.shoot_interval:
+                            boss.last_shot_time = current_time
+
+                            bullet = BossBullet(
+                                boss.rect.centerx,
+                                boss.rect.bottom,
+                                player.rect.centerx,
+                                player.rect.centery
+                            )
+                            boss_bullets.add(bullet)
+                            shoot_sfx.play()
+                            
                         if getattr(configs, "pending_boss_damage", 0) > 0:
                             boss.current_hp -= configs.pending_boss_damage
                             configs.pending_boss_damage = 0
@@ -438,6 +455,11 @@ def main():
                                 hit_counter = 0
                                 quiz.trigger_random()
 
+                        if pygame.sprite.spritecollide(player, boss_bullets, True):
+                            configs.shields -= 1
+                            player_hit_sfx.play()
+
+                        
                         # Проверка за победа на квизот
                         limit = 30 if configs.current_level == 7 else 15 if configs.current_level == 6 else 10 if configs.current_level == 4 else 5
                         if quiz.correct_answers_count >= limit: boss.current_hp = 0
