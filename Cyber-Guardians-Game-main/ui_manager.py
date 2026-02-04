@@ -1103,6 +1103,9 @@ class Boss(pygame.sprite.Sprite):
         self.max_hp = 100 if level == 2 else 200 if level == 4 else 300 if level == 6 else 3000
         self.current_hp = self.max_hp
         self.t = 0.0
+        self.last_shot_time = pygame.time.get_ticks()
+        self.shoot_interval = 1000
+        
         try:
             img = pygame.image.load(os.path.join('assets', 'monster4.png')).convert_alpha() if level==2 else pygame.image.load(os.path.join('assets', 'monster1.png')).convert_alpha() if level==4 else pygame.image.load(os.path.join('assets', 'monster2.png')).convert_alpha() if level==6 else pygame.image.load(os.path.join('assets', 'monster3.png')).convert_alpha()
             self.image = pygame.transform.scale(img, (180, 180))
