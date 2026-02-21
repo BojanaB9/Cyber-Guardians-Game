@@ -414,6 +414,7 @@ def main():
                     if configs.knowledge_points >= target_k:
                         draw_knowledge_summary(screen, configs, collected_lessons)
                         configs.next_level()
+                        bg.load_for_level(configs.current_level)
                         configs.knowledge_points = 0
                         configs.show_instructions = True
                         knowledge_msg = ""
@@ -481,7 +482,7 @@ def main():
                                 pygame.display.flip()
                                 pygame.time.wait(2000)
                                 configs.next_level()
-
+                                bg.load_for_level(configs.current_level)
                                 configs.show_instructions = True
                                 knowledge_msg = ""
 
