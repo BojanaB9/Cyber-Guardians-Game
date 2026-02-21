@@ -1,6 +1,9 @@
 import pygame, sys, random, os
+import asyncio
+
+
 from settings import GameSettings
-from entities import Bullet, Enemy, KnowledgeDrop
+from entities import Bullet, Enemy, KnowledgeDrop, BossBullet
 from ui_manager import *
 from player import Player
 
@@ -13,8 +16,9 @@ def main():
     clock = pygame.time.Clock()
     bg = LayeredBackgroundBlue(configs)
     f_hud = pygame.font.Font(configs.font_path, 14)
+    tts = TTS()
     pygame.mixer.music.load("assets/ES_Tiger Tracks - Lexica.mp3")
-    pygame.mixer.music.set_volume(0.4)  # 0.0 - 1.0
+    pygame.mixer.music.set_volume(0.3)  # 0.0 - 1.0
     pygame.mixer.music.play(-1)  # -1 = infinite loop
     shoot_sfx = pygame.mixer.Sound("assets/ES_laser.wav")
     drop_sfx = pygame.mixer.Sound("assets/ES_Token.mp3")
@@ -303,6 +307,7 @@ def main():
 
     while True:
         dt_ms = clock.tick(60)
+        #await asyncio.sleep(0)
 
         # 1. Избор на јазик
         if configs.show_language_selection:
@@ -385,6 +390,7 @@ def main():
                 drops.update()
                 boss_bullets.update()
 
+
                 # --- НИВОА СО СОБИРАЊЕ (1, 3, 5) ---
                 if configs.current_level % 2 != 0 and configs.current_level < 7:
 
@@ -400,6 +406,9 @@ def main():
                             msg_timer = 200
                             configs.knowledge_points += 1
                             drop_sfx.play()
+                            tts.speak(knowledge_msg)
+
+
 
                     target_k = 5 if configs.current_level == 1 else 10 if configs.current_level == 3 else 15
                     if configs.knowledge_points >= target_k:
@@ -437,7 +446,7 @@ def main():
                             )
                             boss_bullets.add(bullet)
                             shoot_sfx.play()
-                            
+
                         if getattr(configs, "pending_boss_damage", 0) > 0:
                             boss.current_hp -= configs.pending_boss_damage
                             configs.pending_boss_damage = 0
@@ -459,7 +468,6 @@ def main():
                             configs.shields -= 1
                             player_hit_sfx.play()
 
-                        
                         # Проверка за победа на квизот
                         limit = 30 if configs.current_level == 7 else 15 if configs.current_level == 6 else 10 if configs.current_level == 4 else 5
                         if quiz.correct_answers_count >= limit: boss.current_hp = 0
@@ -509,6 +517,7 @@ def main():
             all_sprites.draw(screen)
             enemies.draw(screen)
             drops.draw(screen)
+            boss_bullets.draw(screen)
             if boss: boss.draw(screen)
 
             if boss or configs.current_level == 7:

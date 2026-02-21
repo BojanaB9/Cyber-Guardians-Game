@@ -3,12 +3,67 @@ import pygame
 import os
 import random
 import math
+import pyttsx3
+import threading
+import queue
+import pythoncom
+
+LANGUAGE_CODES = {
+    "EN": "en",   # English
+    "MK": "bg",   # Macedonian → use Bulgarian
+    "TR": "tr",   # Turkish
+    "AL": "sq",   # Albanian
+}
+
+class TTS:
+    def __init__(self):
+        self.queue = queue.Queue()
+        self.thread = threading.Thread(target=self._run, daemon=True)
+        self.thread.start()
+
+    def speak(self, text, lang="EN"):
+        """Add text to the TTS queue with optional language code."""
+        self.queue.put((text, lang.upper()))
+
+    def _run(self):
+        pythoncom.CoInitialize()
+        engine = pyttsx3.init()
+
+        # Cache voices by language for quick lookup
+        voices = engine.getProperty('voices')
+        lang_voice_map = {}
+        for lang_code, prefix in LANGUAGE_CODES.items():
+            matched = None
+            for v in voices:
+                langs = [l.decode('utf-8') if isinstance(l, bytes) else l for l in getattr(v, "languages", [])]
+                if any(prefix in l.lower() for l in langs):
+                    matched = v
+                    break
+            lang_voice_map[lang_code] = matched
+
+        default_voice = engine.getProperty('voice')  # system default
+
+        while True:
+            text, lang = self.queue.get()
+
+            # Pick the voice for this language if available, else fallback to English, else default
+            voice = lang_voice_map.get(lang)
+            if not voice and lang != "EN":
+                voice = lang_voice_map.get("EN")  # fallback to English
+            if voice:
+                engine.setProperty('voice', voice.id)
+            else:
+                engine.setProperty('voice', default_voice)
+
+            engine.say(text)
+            engine.runAndWait()
+            engine.stop()
 
 def draw_language_selection(screen, settings):
     screen.fill((10, 20, 50))
     font = pygame.font.Font(settings.font_path, 20)
     options = [("1. МАКЕДОНСКИ", 'MK'), ("2. ENGLISH", 'EN'), ("3. SHQIP", 'AL'), ("4. TÜRKÇE", 'TR')]
-    title = font.render("CHOOSE LANGUAGE / ИЗБЕРИ ЈАЗИК", True, (255, 255, 255))
+    title = font.render("CHOOSE LANGUAGE / ИЗБЕРИ ЈАЗИК", True, (207, 212, 242))
     screen.blit(title, (450 - title.get_width() // 2, 200))
     for i, (text, code) in enumerate(options):
         txt = font.render(text, True, (0, 255, 255))
@@ -22,7 +77,7 @@ def draw_detailed_level_intro(screen, settings):
     screen.blit(overlay, (0, 0))
     panel_w, panel_h = 700, 500
     panel_x, panel_y = (900 - panel_w) // 2, (700 - panel_h) // 2
-    pygame.draw.rect(screen, (255, 255, 255), (panel_x, panel_y, panel_w, panel_h), border_radius=20)
+    pygame.draw.rect(screen, (207, 212, 242), (panel_x, panel_y, panel_w, panel_h), border_radius=20)
     pygame.draw.rect(screen, (0, 255, 255), (panel_x, panel_y, panel_w, panel_h), width=5, border_radius=20)
     font_title = pygame.font.Font(settings.font_path, 20)
     font_text = pygame.font.Font(settings.font_path, 14)
@@ -1057,7 +1112,7 @@ class QuizSystem:
         if not self.active: return
         ov = pygame.Surface((900, 700), pygame.SRCALPHA); ov.fill((0, 0, 0, 240)); self.screen.blit(ov, (0, 0))
         font = pygame.font.Font(self.settings.font_path, 16)
-        pygame.draw.rect(self.screen, (255, 255, 255), (100, 150, 700, 420), border_radius=15)
+        pygame.draw.rect(self.screen, (207, 212, 242), (100, 150, 700, 420), border_radius=15)
         lang = self.settings.language or 'MK'
         correct_labels = {'MK': "ТОЧНИ", 'EN': "CORRECT", 'AL': "TË SAKTA", 'TR': "DOĞRU"}
         info_labels = {'MK': "ИНФО:", 'EN': "INFO:", 'AL': "INFO:", 'TR': "BİLGİ:"}
@@ -1104,8 +1159,8 @@ class Boss(pygame.sprite.Sprite):
         self.current_hp = self.max_hp
         self.t = 0.0
         self.last_shot_time = pygame.time.get_ticks()
-        self.shoot_interval = 1000
-        
+        self.shoot_interval = 3000
+
         try:
             img = pygame.image.load(os.path.join('assets', 'monster4.png')).convert_alpha() if level==2 else pygame.image.load(os.path.join('assets', 'monster1.png')).convert_alpha() if level==4 else pygame.image.load(os.path.join('assets', 'monster2.png')).convert_alpha() if level==6 else pygame.image.load(os.path.join('assets', 'monster3.png')).convert_alpha()
             self.image = pygame.transform.scale(img, (180, 180))
@@ -1133,8 +1188,8 @@ def draw_knowledge_summary(screen, settings, knowledge_list):
     if not pages: pages = [[]]
     for p_idx, current_page in enumerate(pages):
         overlay = pygame.Surface((900, 700), pygame.SRCALPHA); overlay.fill((0, 20, 60, 245)); screen.blit(overlay, (0, 0))
-        pygame.draw.rect(screen, (255, 255, 255), (30, 30, 840, 640), border_radius=15)
-        pygame.draw.rect(screen, (255, 215, 0), (30, 30, 840, 640), width=5, border_radius=15)
+        pygame.draw.rect(screen, (207, 212, 242), (30, 30, 840, 640), border_radius=15)
+        pygame.draw.rect(screen, (0, 237, 255), (30, 30, 840, 640), width=5, border_radius=15)
         font_t = pygame.font.Font(settings.font_path, 18); font_s = pygame.font.Font(settings.font_path, 9)
         summary_titles = {'MK': "РЕЗИМЕ НА ЗНАЕЊЕТО", 'EN': "KNOWLEDGE SUMMARY", 'AL': "PËRMBLEDHJA E NJOHURIVE", 'TR': "BİLGİ ÖZETİ"}
         title_text = f"{summary_titles.get(lang, 'KNOWLEDGE SUMMARY')} ({p_idx+1}/{len(pages)})"
