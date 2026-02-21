@@ -59,7 +59,6 @@ class TTS:
             engine.runAndWait()
             engine.stop()
 
-
 def draw_language_selection(screen, settings):
     screen.fill((10, 20, 50))
     font = pygame.font.Font(settings.font_path, 20)
