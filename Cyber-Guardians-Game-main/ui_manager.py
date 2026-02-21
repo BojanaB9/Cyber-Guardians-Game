@@ -92,20 +92,45 @@ def draw_detailed_level_intro(screen, settings):
     screen.blit(font_text.render(space_str, True, (150, 0, 0)),
                 (450 - font_text.size(space_str)[0] // 2, panel_y + panel_h - 40))
 
-class LayeredBackgroundBlue:
+class LayeredBackgroundBlue():
     def __init__(self, settings, folder="assets/layered", size=(900, 700)):
         self.settings = settings
+        self.folder = folder
+        self.size = size
         self.t = 0.0
-        try:
-            self.back = pygame.transform.smoothscale(pygame.image.load(os.path.join(folder, "blue-back.png")).convert(), size)
-            self.stars = pygame.transform.smoothscale(pygame.image.load(os.path.join(folder, "blue-stars.png")).convert_alpha(), size)
-            self.props = [
-                {"img": pygame.image.load(os.path.join(folder, "prop-planet-big.png")).convert_alpha(), "pos": (650, 90), "spd": 0.35, "amp": 8},
-                {"img": pygame.image.load(os.path.join(folder, "asteroid-1.png")).convert_alpha(), "pos": (820, 360), "spd": 0.9, "amp": 4}
-            ]
-        except:
-            self.back = pygame.Surface(size); self.back.fill((10, 10, 30))
-            self.stars = pygame.Surface(size, pygame.SRCALPHA); self.props = []
+        self.load_for_level(settings.current_level)
+
+    def load_for_level(self, level):
+        self.stars = pygame.Surface(self.size, pygame.SRCALPHA)
+
+        if level in (1, 2, 7):
+            self.back = pygame.transform.smoothscale(
+                pygame.image.load(os.path.join(self.folder, "blue-back.png")).convert(),
+                self.size
+            )
+            self.stars = pygame.transform.smoothscale(
+                pygame.image.load(os.path.join(self.folder, "blue-stars.png")).convert_alpha(),
+                self.size
+            )
+
+        elif level in (3, 4):
+            self.back = pygame.transform.smoothscale(
+                pygame.image.load(os.path.join(self.folder, "greenbg.jpeg")).convert(),
+                self.size
+            )
+
+        elif level in (5, 6):
+            self.back = pygame.transform.smoothscale(
+                pygame.image.load(os.path.join(self.folder, "blue-back.png")).convert(),
+                self.size
+            )
+
+        self.props = [
+            {"img": pygame.image.load(os.path.join(self.folder, "prop-planet-big.png")).convert_alpha(),
+             "pos": (650, 90), "spd": 0.35, "amp": 8},
+            {"img": pygame.image.load(os.path.join(self.folder, "asteroid-1.png")).convert_alpha(),
+             "pos": (820, 360), "spd": 0.9, "amp": 4}
+        ]
 
     def update(self, dt_ms):
         self.t += dt_ms / 1000.0
@@ -116,6 +141,7 @@ class LayeredBackgroundBlue:
         for p in self.props:
             y = p["pos"][1] + math.sin(self.t * p["spd"]) * p["amp"]
             screen.blit(p["img"], (p["pos"][0], int(y)))
+
 
 class QuizSystem:
     def __init__(self, screen, settings):
