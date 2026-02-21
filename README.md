@@ -10,7 +10,7 @@
 
 
 <h1>Референци:</h1>
-Елементи од позадината: https://ansimuz.itch.io/space-background <br>
+Елементи од позадината: https://ansimuz.itch.io/space-background , https://ansimuz.itch.io/space-backgrounds-2 <br>
 Елементи за играчот: https://realcreative.itch.io/pixel-art-space-game-asset-pack <br>
 Елементи за непријателите: <br>
 -   Вирусот од ниво 2: https://batareya.itch.io/pixel-monster-pack-1 <br> 
