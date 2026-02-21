@@ -1,6 +1,9 @@
 import pygame, sys, random, os
+import asyncio
+
+
 from settings import GameSettings
-from entities import Bullet, Enemy, KnowledgeDrop
+from entities import Bullet, Enemy, KnowledgeDrop, BossBullet
 from ui_manager import *
 from player import Player
 
@@ -13,6 +16,21 @@ def main():
     clock = pygame.time.Clock()
     bg = LayeredBackgroundBlue(configs)
     f_hud = pygame.font.Font(configs.font_path, 14)
+    tts = TTS()
+    pygame.mixer.music.load("assets/ES_Tiger Tracks - Lexica.mp3")
+    pygame.mixer.music.set_volume(0.3)  # 0.0 - 1.0
+    pygame.mixer.music.play(-1)  # -1 = infinite loop
+    shoot_sfx = pygame.mixer.Sound("assets/ES_laser.wav")
+    drop_sfx = pygame.mixer.Sound("assets/ES_Token.mp3")
+    enemy_die_sfx = pygame.mixer.Sound("assets/ES_enemydeath.wav")
+    extra_life_sfx = pygame.mixer.Sound("assets/ES_extralife.wav")
+    player_hit_sfx = pygame.mixer.Sound("assets/ES_playerHit.wav")
+    player_hit_sfx.set_volume(0.6)
+    extra_life_sfx.set_volume(0.5)
+    enemy_die_sfx.set_volume(0.5)
+    shoot_sfx.set_volume(0.4)
+    drop_sfx.set_volume(0.8)
+
     paused = False
 
     # База на знаења
@@ -279,6 +297,7 @@ def main():
             pygame.sprite.Group(), q_sys, None
 
     player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+    boss_bullets = pygame.sprite.Group()
     configs.boss_active = False
     SPAWN_ENEMY = pygame.USEREVENT + 1
     ENEMY_SPAWN_MS = 1000
@@ -288,6 +307,7 @@ def main():
 
     while True:
         dt_ms = clock.tick(60)
+        #await asyncio.sleep(0)
 
         # 1. Избор на јазик
         if configs.show_language_selection:
@@ -317,6 +337,7 @@ def main():
                 collected_lessons = []
                 all_lessons = []
                 player, all_sprites, bullets, enemies, drops, quiz, boss = init_game()
+                boss_bullets.empty()
                 pygame.time.set_timer(SPAWN_ENEMY, ENEMY_SPAWN_MS)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
@@ -329,6 +350,7 @@ def main():
                         b = Bullet(player.rect.centerx, player.rect.top, configs)
                         bullets.add(b)
                         all_sprites.add(b)
+                        shoot_sfx.play()
                 if event.type == SPAWN_ENEMY and not configs.boss_active:
                     enemies.add(Enemy(configs, random.random() < (0.2 + configs.current_level * 0.05)))
 
@@ -366,11 +388,15 @@ def main():
                 bullets.update()
                 enemies.update()
                 drops.update()
+                boss_bullets.update()
+
 
                 # --- НИВОА СО СОБИРАЊЕ (1, 3, 5) ---
                 if configs.current_level % 2 != 0 and configs.current_level < 7:
 
-                    if pygame.sprite.spritecollide(player, enemies, True): configs.shields -= 1
+                    if pygame.sprite.spritecollide(player, enemies, True):
+                        configs.shields -= 1
+                        player_hit_sfx.play()
                     for d in pygame.sprite.spritecollide(player, drops, True):
                         if knowledge_pool:
                             txt = d.text
@@ -379,6 +405,10 @@ def main():
                             all_lessons.append(txt)
                             msg_timer = 200
                             configs.knowledge_points += 1
+                            drop_sfx.play()
+                            tts.speak(knowledge_msg)
+
+
 
                     target_k = 5 if configs.current_level == 1 else 10 if configs.current_level == 3 else 15
                     if configs.knowledge_points >= target_k:
@@ -403,6 +433,20 @@ def main():
 
                     if boss:
                         boss.update(player.rect.centerx)
+                        current_time = pygame.time.get_ticks()
+
+                        if current_time - boss.last_shot_time > boss.shoot_interval:
+                            boss.last_shot_time = current_time
+
+                            bullet = BossBullet(
+                                boss.rect.centerx,
+                                boss.rect.bottom,
+                                player.rect.centerx,
+                                player.rect.centery
+                            )
+                            boss_bullets.add(bullet)
+                            shoot_sfx.play()
+
                         if getattr(configs, "pending_boss_damage", 0) > 0:
                             boss.current_hp -= configs.pending_boss_damage
                             configs.pending_boss_damage = 0
@@ -419,6 +463,10 @@ def main():
                             if hit_counter >= 5:
                                 hit_counter = 0
                                 quiz.trigger_random()
+
+                        if pygame.sprite.spritecollide(player, boss_bullets, True):
+                            configs.shields -= 1
+                            player_hit_sfx.play()
 
                         # Проверка за победа на квизот
                         limit = 30 if configs.current_level == 7 else 15 if configs.current_level == 6 else 10 if configs.current_level == 4 else 5
@@ -447,15 +495,18 @@ def main():
                         e.hp -= 1
                         b.kill()
                         if e.hp <= 0:
+                            enemy_die_sfx.play()
                             if e.is_special and configs.current_level % 2 != 0:
                                 drop = KnowledgeDrop(e.rect.centerx, e.rect.centery, knowledge_pool)
                                 drops.add(drop)
                                 all_sprites.add(drop)
                                 configs.score += 30
+
                             else:
                                 configs.score += 10
 
                             if configs.score // 250 > configs.last_life_score // 250:
+                                extra_life_sfx.play()
                                 configs.shields += 1
                                 configs.last_life_score = (configs.score // 250) * 250
                                 knowledge_msg = "BONUS: +1 LIFE!"
@@ -466,6 +517,7 @@ def main():
             all_sprites.draw(screen)
             enemies.draw(screen)
             drops.draw(screen)
+            boss_bullets.draw(screen)
             if boss: boss.draw(screen)
 
             if boss or configs.current_level == 7:

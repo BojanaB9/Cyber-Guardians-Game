@@ -127,3 +127,27 @@ class KnowledgeDrop(pygame.sprite.Sprite):
 
         if self.rect.top > 700:
             self.kill()
+
+
+class BossBullet(pygame.sprite.Sprite):
+    def __init__(self, x, y, target_x, target_y):
+        super().__init__()
+        self.image = pygame.Surface((6, 12))
+        self.image.fill((255, 50, 50))
+        self.rect = self.image.get_rect(center=(x, y))
+
+        # direction vector toward player
+        dx = target_x - x
+        dy = target_y - y
+        length = max(1, (dx**2 + dy**2) ** 0.5)
+
+        self.speed = 5
+        self.vel_x = dx / length * self.speed
+        self.vel_y = dy / length * self.speed
+
+    def update(self):
+        self.rect.x += self.vel_x
+        self.rect.y += self.vel_y
+
+        if self.rect.top > 800 or self.rect.left < -50 or self.rect.right > 950:
+            self.kill()
