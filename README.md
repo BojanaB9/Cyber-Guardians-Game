@@ -9,14 +9,18 @@
 Space за пукање кон непријателот
 
 Цели:
--Избегнувај закани и непријатели
--Собери колку што можеш повеќе токени
--Одговори точно на кратки квиз-прашања
--Напредувај низ нивоа
-Токени носат поени + знаење
-Погрешни одговори водат до едукативен фидбек
+-Избегнувај закани и непријатели<br> 
+-Собери колку што можеш повеќе токени<br> 
+-Одговори точно на кратки квиз-прашања<br> 
+-Напредувај низ нивоа<br> 
+Токени носат поени + знаење<br> 
+Погрешни одговори водат до едукативен фидбек<br> 
 
-<h1>Слики и видеа од играта</h1>
+<h1>Видео од играта</h1>
+https://youtu.be/kr-e2GSbTxM<br>
+
+<h1>Линк од извршната верзија од играта</h1>
+https://drive.google.com/file/d/1C941035zzJl82iyTNrVKfouRZfwLQF9n/view?usp=sharing<br><br>
 
 <h1>Изработено од:</h1>
 Бојана Боцевска<br>
@@ -47,18 +51,22 @@ The goal of the game is to raise awareness about digital threats through a learn
 During combat, the player receives short quiz questions. If an incorrect answer is given, educational feedback is displayed explaining why the chosen option was risky.
 
 <h1>How to Play</h1>
-Navigation:
-Move the avatar using the left and right arrow keys.
-Press Space to shoot at enemies.
-Objectives:
-Avoid threats and enemies
-Collect as many tokens as possible
-Correctly answer short quiz questions
-Progress through levels
-Tokens provide points and knowledge.
-Incorrect answers trigger educational feedback.
+Navigation:<br> 
+Move the avatar using the left and right arrow keys.<br> 
+Press Space to shoot at enemies.<br> 
+Objectives:<br> 
+Avoid threats and enemies<br> 
+Collect as many tokens as possible<br> 
+Correctly answer short quiz questions<br> 
+Progress through levels<br> 
+Tokens provide points and knowledge.<br> 
+Incorrect answers trigger educational feedback.<br> 
 
-<h1>Screenshots and Videos from the Game</h1>
+<h1>Video from the game</h1>
+https://youtu.be/kr-e2GSbTxM<br>
+
+<h1>Link to the game exe</h1>
+https://drive.google.com/file/d/1C941035zzJl82iyTNrVKfouRZfwLQF9n/view?usp=sharing<br><br>
 
 <h1>Developed by:</h1>
 Bojana Bocevska<br>
