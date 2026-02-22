@@ -130,24 +130,54 @@ class KnowledgeDrop(pygame.sprite.Sprite):
 
 
 class BossBullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, target_x, target_y):
+    def __init__(self, x, y, target_x, target_y, attack_type="aimed"):
         super().__init__()
-        self.image = pygame.Surface((6, 12))
+
+        self.attack_type = attack_type
+
+        # visuals
+        self.image = pygame.Surface((6, 12), pygame.SRCALPHA)
         self.image.fill((255, 50, 50))
         self.rect = self.image.get_rect(center=(x, y))
 
-        # direction vector toward player
+        # direction toward target
         dx = target_x - x
         dy = target_y - y
-        length = max(1, (dx**2 + dy**2) ** 0.5)
+        length = max(1, (dx ** 2 + dy ** 2) ** 0.5)
 
-        self.speed = 5
+        # defaults
+        self.speed = 9
         self.vel_x = dx / length * self.speed
         self.vel_y = dy / length * self.speed
 
+        # special behavior setup
+        if self.attack_type == "fast":
+            self.speed = 13
+            self.vel_x = dx / length * self.speed
+            self.vel_y = dy / length * self.speed
+
+        elif self.attack_type == "zigzag":
+            self.zigzag_timer = 0
+            self.zigzag_strength = 4
+
     def update(self):
-        self.rect.x += self.vel_x
+        # zigzag motion
+        if self.attack_type == "zigzag":
+            self.zigzag_timer += 1
+            zigzag_offset = self.zigzag_strength * (
+                1 if (self.zigzag_timer // 10) % 2 == 0 else -1
+            )
+            self.rect.x += self.vel_x + zigzag_offset
+        else:
+            self.rect.x += self.vel_x
+
         self.rect.y += self.vel_y
 
-        if self.rect.top > 800 or self.rect.left < -50 or self.rect.right > 950:
+        # kill bullet if off-screen
+        if (
+            self.rect.top > 800
+            or self.rect.bottom < -50
+            or self.rect.right < -50
+            or self.rect.left > 950
+        ):
             self.kill()
