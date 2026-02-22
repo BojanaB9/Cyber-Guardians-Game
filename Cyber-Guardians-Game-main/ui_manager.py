@@ -30,7 +30,6 @@ class TTS:
         self.thread.start()
 
     def speak(self, text, lang="EN"):
-        """Add text to the TTS queue with optional language code."""
         self.queue.put((text, lang.upper()))
 
     def _run(self):
@@ -46,16 +45,13 @@ class TTS:
                     matched = v
                     break
             lang_voice_map[lang_code] = matched
-
-        default_voice = engine.getProperty('voice')  # system default
+        default_voice = engine.getProperty('voice') 
 
         while True:
             text, lang = self.queue.get()
-
-            # Pick the voice for this language if available, else fallback to English, else default
             voice = lang_voice_map.get(lang)
             if not voice and lang != "EN":
-                voice = lang_voice_map.get("EN")  # fallback to English
+                voice = lang_voice_map.get("EN") 
             if voice:
                 engine.setProperty('voice', voice.id)
             else:
