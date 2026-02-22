@@ -61,8 +61,8 @@ Incorrect answers trigger educational feedback.
 <h1>Screenshots and Videos from the Game</h1>
 
 <h1>Developed by:</h1>
-Bojana Bocevska
-Meliha Jusufovic
+Bojana Bocevska<br>
+Meliha Jusufovic<br>
 Jasna Jovanova
 
 <h1>References</h1>
