@@ -1,14 +1,20 @@
 import pygame
-import os
 from entities import load_strip, AnimatedSprite
+import sys, os
+
+def resource_path(relative_path):
+    # Get the folder of this script
+    try:
+        base_path = sys._MEIPASS  
+    except AttributeError:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, relative_path)
 
 class Player(AnimatedSprite):
     def __init__(self, settings):
         self.settings = settings
-
-        # 7 frames of 32x40
         frames = load_strip(
-            os.path.join("assets", "player_spaceship_1.png"),
+            resource_path(os.path.join("assets", "player_spaceship_1.png")),
             frame_w=32,
             frame_h=40,
             scale_to=(70, 90)
