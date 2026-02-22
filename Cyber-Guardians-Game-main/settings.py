@@ -1,5 +1,5 @@
 import pygame
-import os
+import sys, os
 
 class GameSettings:
     def __init__(self):
@@ -23,7 +23,7 @@ class GameSettings:
         self.show_instructions = True
         self.boss_active = False
         self.victory = False
-        self.font_path = os.path.join("assets", "PressStart2P-Regular.ttf")
+        self.font_path = "assets/PressStart2P-Regular.ttf"
         self.bg_color = (10, 10, 30)
         self.pending_boss_damage = 0
 
@@ -137,8 +137,6 @@ class GameSettings:
 
     def next_level(self):
         self.current_level += 1
-        # Позначајно забрзување на непријателите
         self.enemy_speed += 0.8
-        # Зголемување на брзината на играчот
         self.player_speed += 0.5
         self.boss_active = False
