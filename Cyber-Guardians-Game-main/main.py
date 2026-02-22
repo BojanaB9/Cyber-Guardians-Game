@@ -7,6 +7,15 @@ from entities import Bullet, Enemy, KnowledgeDrop, BossBullet
 from ui_manager import *
 from player import Player
 
+import sys, os
+
+def resource_path(relative_path):
+    # Get the folder of this script
+    try:
+        base_path = sys._MEIPASS  # PyInstaller temp folder
+    except AttributeError:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, relative_path)
 
 def main():
     pygame.init()
@@ -15,16 +24,16 @@ def main():
     pygame.display.set_caption("Cyber Guardians")
     clock = pygame.time.Clock()
     bg = LayeredBackgroundBlue(configs)
-    f_hud = pygame.font.Font(configs.font_path, 14)
+    f_hud = pygame.font.Font(resource_path(configs.font_path), 14)
     tts = TTS()
-    pygame.mixer.music.load("assets/ES_Tiger Tracks - Lexica.mp3")
+    pygame.mixer.music.load(resource_path("assets/ES_Tiger Tracks - Lexica.mp3"))
     pygame.mixer.music.set_volume(0.3)  # 0.0 - 1.0
     pygame.mixer.music.play(-1)  # -1 = infinite loop
-    shoot_sfx = pygame.mixer.Sound("assets/ES_laser.wav")
-    drop_sfx = pygame.mixer.Sound("assets/ES_Token.mp3")
-    enemy_die_sfx = pygame.mixer.Sound("assets/ES_enemydeath.wav")
-    extra_life_sfx = pygame.mixer.Sound("assets/ES_extralife.wav")
-    player_hit_sfx = pygame.mixer.Sound("assets/ES_playerHit.wav")
+    shoot_sfx = pygame.mixer.Sound(resource_path("assets/ES_laser.wav"))
+    drop_sfx = pygame.mixer.Sound(resource_path("assets/ES_Token.mp3"))
+    enemy_die_sfx = pygame.mixer.Sound(resource_path("assets/ES_enemydeath.wav"))
+    extra_life_sfx = pygame.mixer.Sound(resource_path("assets/ES_extralife.wav"))
+    player_hit_sfx = pygame.mixer.Sound(resource_path("assets/ES_playerHit.wav"))
     player_hit_sfx.set_volume(0.6)
     extra_life_sfx.set_volume(0.5)
     enemy_die_sfx.set_volume(0.5)
@@ -438,6 +447,7 @@ def main():
 
                         if current_time - boss.last_shot_time > boss.shoot_interval:
                             boss.last_shot_time = current_time
+                            # choose attack based on boss level
                             if configs.current_level == 2:
                                 attack_type = "aimed"
                             elif configs.current_level == 4:
