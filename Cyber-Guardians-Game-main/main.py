@@ -438,12 +438,23 @@ def main():
 
                         if current_time - boss.last_shot_time > boss.shoot_interval:
                             boss.last_shot_time = current_time
+                            if configs.current_level == 2:
+                                attack_type = "aimed"
+                            elif configs.current_level == 4:
+                                attack_type = "fast"
+                            elif configs.current_level == 6:
+                                attack_type = "zigzag"
+                            elif configs.current_level == 7:
+                                attack_type = random.choice(["fast", "zigzag"])
+                            else:
+                                attack_type = "aimed"
 
                             bullet = BossBullet(
                                 boss.rect.centerx,
                                 boss.rect.bottom,
                                 player.rect.centerx,
-                                player.rect.centery
+                                player.rect.centery,
+                                attack_type
                             )
                             boss_bullets.add(bullet)
                             shoot_sfx.play()
