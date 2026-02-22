@@ -39,3 +39,54 @@ SFX: <br>
 Убивање на непријател: https://www.epidemicsound.com/sound-effects/tracks/708876e5-66eb-4f57-a8ec-ab9ce4a15a7f/ <br>
 Екстра живот: https://www.epidemicsound.com/sound-effects/tracks/3db0fac8-6ff1-4460-834c-2bd07ec13804/ <br>
 Играчот губи живот: https://www.epidemicsound.com/sound-effects/tracks/e6d4b172-0908-49eb-8b7b-34bfdc859b73/
+
+<h1>About</h1>
+The game titled “Cyber Guardians” is an educational 2D space-shooter game that, through several dynamic levels, introduces children to the basics of internet safety. In the game, the player takes on the role of a “Cyber Guardian” who travels through digital space and faces enemy aircraft and threats that represent real dangers from the online world.
+The game is designed for children aged 7 and above. The controls and rules are simple: the player moves through the digital environment, avoids or shoots dangers, and collects tokens that symbolize good cybersecurity habits. To progress, the player must collect “knowledge” points, which are necessary to confront the main virus at the end of each level.
+The goal of the game is to raise awareness about digital threats through a learning-by-playing approach. Instead of passively reading rules, the player actively participates and makes decisions that directly affect their progress in the main battle of each level, helping security practices become easier to remember.
+During combat, the player receives short quiz questions. If an incorrect answer is given, educational feedback is displayed explaining why the chosen option was risky.
+
+<h1>How to Play</h1>
+Navigation:
+Move the avatar using the left and right arrow keys.
+Press Space to shoot at enemies.
+Objectives:
+Avoid threats and enemies
+Collect as many tokens as possible
+Correctly answer short quiz questions
+Progress through levels
+Tokens provide points and knowledge.
+Incorrect answers trigger educational feedback.
+
+<h1>Screenshots and Videos from the Game</h1>
+
+<h1>Developed by:</h1>
+Bojana Bocevska
+Meliha Jusufovic
+Jasna Jovanova
+
+<h1>References</h1>
+Background elements:
+https://ansimuz.itch.io/space-background�
+https://ansimuz.itch.io/space-backgrounds-2�
+Player assets:
+https://realcreative.itch.io/pixel-art-space-game-asset-pack�
+Enemy assets:
+Level 2 virus: https://batareya.itch.io/pixel-monster-pack-1�
+Viruses from levels 4, 6, and 7: https://lunascra.itch.io/50-rpg-dungeon-monsters-pixel-art-enemy-pack�
+Aircraft: https://realcreative.itch.io/pixel-art-space-game-asset-pack�
+Token sprite:
+https://gentlecatstudio.itch.io/rpg-items�
+SFX:
+Music:
+https://www.epidemicsound.com/music/tracks/d7f0289f-f59b-3cb0-8c54-f57d87c4e89d/�
+Token collection sound:
+https://www.epidemicsound.com/sound-effects/tracks/8c1d15d0-5d14-48e6-864a-8b485ac80029/�
+Laser sound:
+https://www.epidemicsound.com/sound-effects/tracks/f08f4ea3-5d22-4404-a65a-36ad233a190f/�
+Enemy destroyed sound:
+https://www.epidemicsound.com/sound-effects/tracks/708876e5-66eb-4f57-a8ec-ab9ce4a15a7f/�
+Extra life sound:
+https://www.epidemicsound.com/sound-effects/tracks/3db0fac8-6ff1-4460-834c-2bd07ec13804/�
+Player loses life sound:
+https://www.epidemicsound.com/sound-effects/tracks/e6d4b172-0908-49eb-8b7b-34bfdc859b73/�
