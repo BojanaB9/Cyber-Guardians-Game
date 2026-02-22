@@ -67,26 +67,26 @@ Jasna Jovanova
 
 <h1>References</h1>
 Background elements:
-https://ansimuz.itch.io/space-background�
-https://ansimuz.itch.io/space-backgrounds-2�
+https://ansimuz.itch.io/space-background<br>
+https://ansimuz.itch.io/space-backgrounds-2<br>
 Player assets:
-https://realcreative.itch.io/pixel-art-space-game-asset-pack�
+https://realcreative.itch.io/pixel-art-space-game-asset-pack<br>
 Enemy assets:
-Level 2 virus: https://batareya.itch.io/pixel-monster-pack-1�
-Viruses from levels 4, 6, and 7: https://lunascra.itch.io/50-rpg-dungeon-monsters-pixel-art-enemy-pack�
-Aircraft: https://realcreative.itch.io/pixel-art-space-game-asset-pack�
+Level 2 virus: https://batareya.itch.io/pixel-monster-pack-1<br>
+Viruses from levels 4, 6, and 7: https://lunascra.itch.io/50-rpg-dungeon-monsters-pixel-art-enemy-pack<br>
+Aircraft: https://realcreative.itch.io/pixel-art-space-game-asset-pack<br>
 Token sprite:
-https://gentlecatstudio.itch.io/rpg-items�
+https://gentlecatstudio.itch.io/rpg-items<br>
 SFX:
 Music:
-https://www.epidemicsound.com/music/tracks/d7f0289f-f59b-3cb0-8c54-f57d87c4e89d/�
+https://www.epidemicsound.com/music/tracks/d7f0289f-f59b-3cb0-8c54-f57d87c4e89d/<br>
 Token collection sound:
-https://www.epidemicsound.com/sound-effects/tracks/8c1d15d0-5d14-48e6-864a-8b485ac80029/�
+https://www.epidemicsound.com/sound-effects/tracks/8c1d15d0-5d14-48e6-864a-8b485ac80029/<br>
 Laser sound:
-https://www.epidemicsound.com/sound-effects/tracks/f08f4ea3-5d22-4404-a65a-36ad233a190f/�
+https://www.epidemicsound.com/sound-effects/tracks/f08f4ea3-5d22-4404-a65a-36ad233a190f/<br>
 Enemy destroyed sound:
-https://www.epidemicsound.com/sound-effects/tracks/708876e5-66eb-4f57-a8ec-ab9ce4a15a7f/�
+https://www.epidemicsound.com/sound-effects/tracks/708876e5-66eb-4f57-a8ec-ab9ce4a15a7f/<br>
 Extra life sound:
-https://www.epidemicsound.com/sound-effects/tracks/3db0fac8-6ff1-4460-834c-2bd07ec13804/�
+https://www.epidemicsound.com/sound-effects/tracks/3db0fac8-6ff1-4460-834c-2bd07ec13804/<br>
 Player loses life sound:
-https://www.epidemicsound.com/sound-effects/tracks/e6d4b172-0908-49eb-8b7b-34bfdc859b73/�
+https://www.epidemicsound.com/sound-effects/tracks/e6d4b172-0908-49eb-8b7b-34bfdc859b73/<br>
