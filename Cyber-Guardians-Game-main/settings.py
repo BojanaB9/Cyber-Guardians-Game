@@ -5,17 +5,16 @@ class GameSettings:
     def __init__(self):
         self.screen_width = 900
         self.screen_height = 700
-        self.language = None  # Се поставува при избор (MK, EN, AL, TR)
+        self.language = None 
         self.show_language_selection = True
         self.reset_game()
 
     def reset_game(self):
-        # Основни параметри за движење и тежина
         self.player_speed = 6
         self.bullet_speed = -8
         self.enemy_speed = 1.0
         self.score = 0
-        self.last_life_score = 0 # Следење на прагот за бонус животи
+        self.last_life_score = 0 
         self.knowledge_points = 0
         self.shields = 3
         self.current_level = 1
@@ -26,8 +25,7 @@ class GameSettings:
         self.font_path = "assets/PressStart2P-Regular.ttf"
         self.bg_color = (10, 10, 30)
         self.pending_boss_damage = 0
-
-        # Целосен речник со преводи за сите клучеви и јазици
+        
         self.translations = {
             'MK': {
                 'hud': "НИВО: {} | ЖИВОТИ: {} | ПОЕНИ: {} | ЗНАЕЊЕ: {}",
