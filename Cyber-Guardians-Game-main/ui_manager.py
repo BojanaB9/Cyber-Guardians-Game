@@ -7,6 +7,14 @@ import pyttsx3
 import threading
 import queue
 import pythoncom
+import sys, os
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS  
+    except AttributeError:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, relative_path)
 
 LANGUAGE_CODES = {
     "EN": "en",   # English
@@ -28,8 +36,6 @@ class TTS:
     def _run(self):
         pythoncom.CoInitialize()
         engine = pyttsx3.init()
-
-        # Cache voices by language for quick lookup
         voices = engine.getProperty('voices')
         lang_voice_map = {}
         for lang_code, prefix in LANGUAGE_CODES.items():
@@ -59,9 +65,10 @@ class TTS:
             engine.runAndWait()
             engine.stop()
 
+
 def draw_language_selection(screen, settings):
     screen.fill((10, 20, 50))
-    font = pygame.font.Font(settings.font_path, 20)
+    font = pygame.font.Font(resource_path(settings.font_path), 20)
     options = [("1. МАКЕДОНСКИ", 'MK'), ("2. ENGLISH", 'EN'), ("3. SHQIP", 'AL'), ("4. TÜRKÇE", 'TR')]
     title = font.render("CHOOSE LANGUAGE / ИЗБЕРИ ЈАЗИК", True, (207, 212, 242))
     screen.blit(title, (450 - title.get_width() // 2, 200))
@@ -79,8 +86,8 @@ def draw_detailed_level_intro(screen, settings):
     panel_x, panel_y = (900 - panel_w) // 2, (700 - panel_h) // 2
     pygame.draw.rect(screen, (207, 212, 242), (panel_x, panel_y, panel_w, panel_h), border_radius=20)
     pygame.draw.rect(screen, (0, 255, 255), (panel_x, panel_y, panel_w, panel_h), width=5, border_radius=20)
-    font_title = pygame.font.Font(settings.font_path, 20)
-    font_text = pygame.font.Font(settings.font_path, 14)
+    font_title = pygame.font.Font(resource_path(settings.font_path), 20)
+    font_text = pygame.font.Font(resource_path(settings.font_path), 14)
     title_str = settings.translations[lang]['level_titles'].get(lvl, "")
     title_surf = font_title.render(title_str, True, (0, 0, 100))
     screen.blit(title_surf, (450 - title_surf.get_width() // 2, panel_y + 40))
@@ -105,30 +112,30 @@ class LayeredBackgroundBlue():
 
         if level in (1, 2, 7):
             self.back = pygame.transform.smoothscale(
-                pygame.image.load(os.path.join(self.folder, "blue-back.png")).convert(),
+                pygame.image.load(resource_path(os.path.join(self.folder, "blue-back.png"))).convert(),
                 self.size
             )
             self.stars = pygame.transform.smoothscale(
-                pygame.image.load(os.path.join(self.folder, "blue-stars.png")).convert_alpha(),
+                pygame.image.load(resource_path(os.path.join(self.folder, "blue-stars.png"))).convert_alpha(),
                 self.size
             )
 
         elif level in (3, 4):
             self.back = pygame.transform.smoothscale(
-                pygame.image.load(os.path.join(self.folder, "greenbg.jpeg")).convert(),
+                pygame.image.load(resource_path(os.path.join(self.folder, "greenbg.jpeg"))).convert(),
                 self.size
             )
 
         elif level in (5, 6):
             self.back = pygame.transform.smoothscale(
-                pygame.image.load(os.path.join(self.folder, "blue-back.png")).convert(),
+                pygame.image.load(resource_path(os.path.join(self.folder, "redbg.jpeg"))).convert(),
                 self.size
             )
 
         self.props = [
-            {"img": pygame.image.load(os.path.join(self.folder, "prop-planet-big.png")).convert_alpha(),
+            {"img": pygame.image.load(resource_path(os.path.join(self.folder, "prop-planet-big.png"))).convert_alpha(),
              "pos": (650, 90), "spd": 0.35, "amp": 8},
-            {"img": pygame.image.load(os.path.join(self.folder, "asteroid-1.png")).convert_alpha(),
+            {"img": pygame.image.load(resource_path(os.path.join(self.folder, "asteroid-1.png"))).convert_alpha(),
              "pos": (820, 360), "spd": 0.9, "amp": 4}
         ]
 
@@ -1137,7 +1144,7 @@ class QuizSystem:
     def draw(self):
         if not self.active: return
         ov = pygame.Surface((900, 700), pygame.SRCALPHA); ov.fill((0, 0, 0, 240)); self.screen.blit(ov, (0, 0))
-        font = pygame.font.Font(self.settings.font_path, 16)
+        font = pygame.font.Font(resource_path(self.settings.font_path), 16)
         pygame.draw.rect(self.screen, (207, 212, 242), (100, 150, 700, 420), border_radius=15)
         lang = self.settings.language or 'MK'
         correct_labels = {'MK': "ТОЧНИ", 'EN': "CORRECT", 'AL': "TË SAKTA", 'TR': "DOĞRU"}
@@ -1188,7 +1195,7 @@ class Boss(pygame.sprite.Sprite):
         self.shoot_interval = 3000
 
         try:
-            img = pygame.image.load(os.path.join('assets', 'monster4.png')).convert_alpha() if level==2 else pygame.image.load(os.path.join('assets', 'monster1.png')).convert_alpha() if level==4 else pygame.image.load(os.path.join('assets', 'monster2.png')).convert_alpha() if level==6 else pygame.image.load(os.path.join('assets', 'monster3.png')).convert_alpha()
+            img = pygame.image.load(resource_path(os.path.join('assets', 'monster4.png'))).convert_alpha() if level==2 else pygame.image.load(resource_path(os.path.join('assets', 'monster1.png'))).convert_alpha() if level==4 else pygame.image.load(resource_path(os.path.join('assets', 'monster2.png'))).convert_alpha() if level==6 else pygame.image.load(resource_path(os.path.join('assets', 'monster3.png'))).convert_alpha()
             self.image = pygame.transform.scale(img, (180, 180))
         except: self.image = pygame.Surface((150, 150)); self.image.fill((150, 0, 0))
         self.rect = self.image.get_rect(center=(450, -100))
@@ -1216,7 +1223,8 @@ def draw_knowledge_summary(screen, settings, knowledge_list):
         overlay = pygame.Surface((900, 700), pygame.SRCALPHA); overlay.fill((0, 20, 60, 245)); screen.blit(overlay, (0, 0))
         pygame.draw.rect(screen, (207, 212, 242), (30, 30, 840, 640), border_radius=15)
         pygame.draw.rect(screen, (0, 237, 255), (30, 30, 840, 640), width=5, border_radius=15)
-        font_t = pygame.font.Font(settings.font_path, 18); font_s = pygame.font.Font(settings.font_path, 9)
+        font_t = pygame.font.Font(resource_path(settings.font_path), 18);
+        font_s = pygame.font.Font(resource_path(settings.font_path), 9)
         summary_titles = {'MK': "РЕЗИМЕ НА ЗНАЕЊЕТО", 'EN': "KNOWLEDGE SUMMARY", 'AL': "PËRMBLEDHJA E NJOHURIVE", 'TR': "BİLGİ ÖZETİ"}
         title_text = f"{summary_titles.get(lang, 'KNOWLEDGE SUMMARY')} ({p_idx+1}/{len(pages)})"
         title_surf = font_t.render(title_text, True, (0, 0, 100))
@@ -1224,7 +1232,7 @@ def draw_knowledge_summary(screen, settings, knowledge_list):
         for i, lesson in enumerate(current_page):
             col, row = i // 8, i % 8
             x, y_pos = (65 if col == 0 else 465), 110 + row * 65
-            pygame.draw.circle(screen, (255, 140, 0), (x - 15, y_pos + 5), 4)
+            pygame.draw.circle(screen, (0, 237, 255), (x - 15, y_pos + 5), 4)
             draw_text_wrapped(screen, lesson, x, y_pos, 360, font_s, (30, 30, 30))
         space_txt = settings.translations[lang]['press_space']
         screen.blit(font_s.render(space_txt, True, (200, 0, 0)), (450 - font_s.size(space_txt)[0] // 2, 645))
@@ -1236,36 +1244,33 @@ def draw_knowledge_summary(screen, settings, knowledge_list):
                 if event.type == pygame.QUIT: pygame.quit(); sys.exit()
 
 def draw_victory_screen(screen, settings):
-    screen.fill((0, 40, 0)); f = pygame.font.Font(settings.font_path, 20)
+    screen.fill((0, 40, 0)); f = pygame.font.Font(resource_path(settings.font_path), 20)
     msg = settings.translations[settings.language]['victory_msg']
     screen.blit(f.render(msg, True, (255, 255, 0)), (450 - f.size(msg)[0] // 2, 350))
 
 def draw_level_complete(screen, settings):
     lang = settings.language or 'MK'
     msg = settings.translations[lang].get('level_up', "LEVEL COMPLETE").format(settings.current_level)
-    font = pygame.font.Font(settings.font_path, 22)
+    font = pygame.font.Font(resource_path(settings.font_path), 22)
     txt_surf = font.render(msg, True, (0, 255, 0))
     screen.blit(txt_surf, (450 - txt_surf.get_width() // 2, 350))
 
 
 def draw_victory_screen(screen, settings, all_lessons):
     lang = settings.language or 'MK'
-    # Делење на сите лекции на страници за крајниот преглед (по 12 на страница)
     pages = [all_lessons[i:i + 12] for i in range(0, len(all_lessons), 12)]
     if not pages: pages = [[]]
 
     for p_idx, current_page in enumerate(pages):
-        # Позадина: Темно зелена за победничка атмосфера
         screen.fill((0, 40, 0))
-        f_title = pygame.font.Font(settings.font_path, 22)
-        f_text = pygame.font.Font(settings.font_path, 10)
+        f_title = pygame.font.Font(resource_path(settings.font_path), 22)
+        f_text = pygame.font.Font(resource_path(settings.font_path), 10)
 
-        # 1. Главна порака за победа (од settings.py)
         msg = settings.translations[lang]['victory_msg']
-        title_surf = f_title.render(msg, True, (255, 255, 0))  # Жолта боја
+        title_surf = f_title.render(msg, True, (255, 255, 0))
         screen.blit(title_surf, (450 - title_surf.get_width() // 2, 50))
 
-        # 2. Поднаслов за листа на вештини со индикатор за страница
+
         sub_titles = {
             'MK': "ЛИСТА НА ТВОИТЕ САЈБЕР ВЕШТИНИ:",
             'EN': "YOUR CYBER SKILLS LIST:",
@@ -1273,7 +1278,6 @@ def draw_victory_screen(screen, settings, all_lessons):
             'TR': "SİBER YETENEK LİSTENİZ:"
         }
 
-        # Прикажи го индикаторот за страница само ако има повеќе од една страница
         sub_label = sub_titles.get(lang, '')
         if len(pages) > 1:
             sub_text = f"{sub_label} ({p_idx + 1}/{len(pages)})"
@@ -1283,20 +1287,17 @@ def draw_victory_screen(screen, settings, all_lessons):
         sub_surf = f_text.render(sub_text, True, (255, 255, 255))
         screen.blit(sub_surf, (450 - sub_surf.get_width() // 2, 100))
 
-        # 3. Исцртување на собраните лекции
         for i, lesson in enumerate(current_page):
             y_pos = 150 + i * 40
             # Се користи draw_text_wrapped за долгите реченици
             draw_text_wrapped(screen, f"• {lesson}", 100, y_pos, 700, f_text, (200, 255, 200))
 
-        # 4. Порака за продолжување на дното
         exit_msg = settings.translations[lang]['press_space']
         exit_surf = f_text.render(exit_msg, True, (255, 255, 255))
         screen.blit(exit_surf, (450 - exit_surf.get_width() // 2, 650))
 
         pygame.display.flip()
 
-        # Блокирачки циклус кој чека играчот да притисне SPACE за следна страна
         waiting = True
         while waiting:
             for event in pygame.event.get():
@@ -1309,13 +1310,12 @@ def draw_victory_screen(screen, settings, all_lessons):
 def draw_victory_congratulations(screen, settings):
     lang = settings.language or 'MK'
     screen.fill((0, 50, 0))
-    f_big = pygame.font.Font(settings.font_path, 20) # Малку помал фонт за да собере
-    f_small = pygame.font.Font(settings.font_path, 14)
+    f_big = pygame.font.Font(resource_path(settings.font_path), 20) # Малку помал фонт за да собере
+    f_small = pygame.font.Font(resource_path(settings.font_path), 14)
 
-    # 1. Порака за честитки - СОВРШЕНО ЦЕНТРИРАНА
     msg = settings.translations[lang]['victory_msg']
     title_surf = f_big.render(msg, True, (255, 255, 0))
-    title_rect = title_surf.get_rect(center=(450, 200)) # Центрирање по X и Y
+    title_rect = title_surf.get_rect(center=(450, 200))
     screen.blit(title_surf, title_rect)
 
     options = {
@@ -1325,7 +1325,6 @@ def draw_victory_congratulations(screen, settings):
         'TR': ["Bilgi için SPACE'e bas", "Yeniden başlatmak için 'R'ye bas", "Çıkmak için ESC'ye bas"]
     }
 
-    # 2. Опции - ЦЕНТРИРАНИ
     lines = options.get(lang, options['EN'])
     for i, line in enumerate(lines):
         txt_surf = f_small.render(line, True, (255, 255, 255))
@@ -1333,7 +1332,7 @@ def draw_victory_congratulations(screen, settings):
         screen.blit(txt_surf, txt_rect)
 
     pygame.display.flip()
-    while True:  # Внимавајте на латиницата тука!
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: return "QUIT"
             if event.type == pygame.KEYDOWN:
